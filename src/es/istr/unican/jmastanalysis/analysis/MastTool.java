@@ -12,8 +12,10 @@ import org.apache.commons.io.FilenameUtils;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -99,6 +101,21 @@ public class MastTool {
         System.out.println(cmd);
         try {
             p = r.exec(cmd);
+
+            // IMPORTANTE: Cuando ejecuto el analisis de un sistema grande, el proceso nunca regresa. Esto ocurre pq la
+            // salida del proceso es demasiado grande, y necesita ser leida para vaciar los bufferes.
+            // (cuanto mas grande es el sistema, mas grande es lo que sale por pantalla cuando se analiza).
+            // Leyendo el inputstream del proceso, vacio los bufferes, y el proceso puede finalizar.
+            // java.lang
+            // Class Process
+            // Because some native platforms only provide limited buffer size for standard input and output streams,
+            // failure to promptly write the input stream or read the output stream of the subprocess may cause the
+            // subprocess to block, and even deadlock.
+
+            BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(p.getInputStream()));
+            while ((reader.readLine()) != null) {}
+
             p.waitFor();
 
 //            System.out.println(cmd);

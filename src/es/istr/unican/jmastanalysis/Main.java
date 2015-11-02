@@ -29,7 +29,7 @@ public class Main {
         s.setSeed(10);
         s.setnProcs(4);
         s.setnFlows(4);
-        s.setnTasks(3);
+        s.setnTasks(7);
         s.setRandomLength(false);
         s.setSingleFlows(0f);
         s.setSchedPolicy("FP");
@@ -53,10 +53,11 @@ public class Main {
         s.setDeadline(d);
 
         MastSystem sys = new MastSystem(s);
-//        sys.setPDPriorities();
-//        sys.calculateExactResponseTimes();
-//        sys.printResultsOverview();
-//        System.out.println(sys.getSystemSchedIndex());
+        sys.setPDPriorities();
+        sys.calculateExactResponseTimes();
+        sys.printResultsOverview();
+        System.out.println(sys.getSystemSchedIndex());
+        System.out.println("");
 
 
         // Mast Analysis Configuration
