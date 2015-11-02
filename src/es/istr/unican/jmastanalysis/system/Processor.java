@@ -142,7 +142,7 @@ public class Processor {
     }
 
     // Exact response time analysis (for independent tasks)
-    public void calculateExactResponseTimes(){
+    public void calculateExactLocalResponseTimes(){
         // Sort tasks list according to their priorities (first task has higher priority)
         tasks.sort((t1, t2) -> t2.getPriority()-t1.getPriority());
         for (int n=1; n<=tasks.size(); n++){

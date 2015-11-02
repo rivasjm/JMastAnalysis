@@ -29,7 +29,7 @@ public class Main {
         s.setSeed(10);
         s.setnProcs(4);
         s.setnFlows(4);
-        s.setnTasks(7);
+        s.setnTasks(5);
         s.setRandomLength(false);
         s.setSingleFlows(0f);
         s.setSchedPolicy("FP");

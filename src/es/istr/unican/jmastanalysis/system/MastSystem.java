@@ -146,7 +146,7 @@ public class MastSystem {
 
     public void calculateExactResponseTimes(){
         for (Processor p: processors){
-            p.calculateExactResponseTimes();
+            p.calculateExactLocalResponseTimes();
         }
 
         for (Flow f: flows){

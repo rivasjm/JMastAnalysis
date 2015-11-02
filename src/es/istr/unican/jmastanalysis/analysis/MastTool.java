@@ -98,7 +98,6 @@ public class MastTool {
 //            break;
 //        }
 
-        System.out.println(cmd);
         try {
             p = r.exec(cmd);
 
