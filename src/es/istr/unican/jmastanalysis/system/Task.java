@@ -126,7 +126,7 @@ public class Task {
     }
 
     public void printOverview() {
-        java.lang.System.out.format("(%f)%d", wcet, processor.getId());
+        java.lang.System.out.format("(%f, %d, %d)", wcet, processor.getId(), priority);
     }
 
     private void printResult(){

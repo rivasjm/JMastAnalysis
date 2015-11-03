@@ -25,21 +25,18 @@ public class Main {
         SystemConfig s = new SystemConfig();
         PeriodConfig p = new PeriodConfig();
         UtilizationConfig u = new UtilizationConfig();
-
         s.setSeed(10);
-        s.setnProcs(4);
-        s.setnFlows(4);
-        s.setnTasks(5);
+        s.setnProcs(1);
+        s.setnFlows(2);
+        s.setnTasks(2);
         s.setRandomLength(false);
         s.setSingleFlows(0f);
         s.setSchedPolicy("FP");
         s.setLocalization(LocalizationOptions.RANDOM);
-
         p.setBase(10f);
         p.setDistribution(PeriodDistributionOptions.UNIFORM);
         p.setRatio(10f);
         s.setPeriod(p);
-
         u.setBalancing(LoadBalancingOptions.BALANCED);
         u.setWcetMethod(WCETGenerationOptions.SCALE);
         u.setBcetFactor(0f);
@@ -48,28 +45,18 @@ public class Main {
         u.setTop(80);
         u.setCurrentU(10);
         s.setUtilization(u);
-
         DeadlineConfig d = new DeadlineConfig("NT");
         s.setDeadline(d);
-
-        MastSystem sys = new MastSystem(s);
-        sys.setPDPriorities();
-        sys.calculateExactResponseTimes();
-        sys.printResultsOverview();
-        System.out.println(sys.getSystemSchedIndex());
-        System.out.println("");
-
 
         // Mast Analysis Configuration
         MastConfig m = new MastConfig();
         HOSPAConfig h = new HOSPAConfig();
-
         m.setName("Ejemplo");
         m.setWorkPath(".");
         m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
         m.setAnalysis(AnalysisOptions.HOLISTIC);
         m.setSync(false);
-        m.setAssignment(AssignmentOptions.PD);
+        m.setAssignment(AssignmentOptions.NONE);
         m.setHospaConfig(h);
         m.setStopFactor(10.0f);
         m.setGsd(false);
@@ -77,12 +64,24 @@ public class Main {
         m.setCalculateSlack(false);
         m.setJitterAvoidance(false);
 
-        // Analyze
-
-        MastTool.analyze(sys, m);
+        // Exact analysis for independent tasks
+        MastSystem sys = new MastSystem(s);
+        sys.setPDPriorities();
+        sys.calculateExactResponseTimes();
+        sys.printOverview();
         System.out.println("");
+        System.out.println("Exact analysis for independent tasks");
         sys.printResultsOverview();
         System.out.println(sys.getSystemSchedIndex());
+        System.out.println("");
+
+        // Holistic Analysis
+        System.out.println("Holistic analysis");
+        MastTool.analyze(sys, m);
+        sys.printResultsOverview();
+        System.out.println(sys.getSystemSchedIndex());
+        System.out.println("");
+
 
 
     }
