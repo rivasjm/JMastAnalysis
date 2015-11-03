@@ -66,7 +66,7 @@ public class Main {
 
         m.setName("Ejemplo");
         m.setWorkPath(".");
-        m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
+        m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
         m.setAnalysis(AnalysisOptions.HOLISTIC);
         m.setSync(false);
         m.setAssignment(AssignmentOptions.PD);

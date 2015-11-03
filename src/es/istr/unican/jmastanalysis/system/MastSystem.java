@@ -180,7 +180,7 @@ public class MastSystem {
                 if (i <= singleFlows) {
                     nTasks = 1;
                 } else if (c.getRandomLength()) {
-                    nTasks = random.nextInt(c.getnTasks() - 2) + 2; // random integer between [2, number of tasks]
+                    nTasks = random.nextInt((c.getnTasks()+1) - 2) + 2; // random integer between [2, number of tasks]
                 } else {
                     nTasks = c.getnTasks();
                 }
