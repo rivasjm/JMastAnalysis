@@ -70,6 +70,10 @@ public class Utils {
         return input.subList(0, outputLength);
     }
 
+    public static int getRandomInt(int min, int max) {
+        return new Random().nextInt(max-min+1)+min;
+    }
+
 
     public static void main(String[] args) {
 
