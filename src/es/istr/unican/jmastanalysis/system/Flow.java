@@ -195,7 +195,7 @@ public class Flow {
             java.lang.System.out.printf("%f", t.getWcrt());
             java.lang.System.out.printf(" ");
         }
-        java.lang.System.out.printf(": %f\n", deadline);
+        java.lang.System.out.printf(": %f -> SI=%f%%\n", deadline, calculateSchedIndex());
     }
 
     public void setTaskResults(String taskID, Double bcrt, Double wcrt, Double jitter) {

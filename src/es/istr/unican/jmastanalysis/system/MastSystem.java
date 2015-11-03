@@ -144,11 +144,19 @@ public class MastSystem {
         }
     }
 
-    public void calculateExactResponseTimes(){
+    public void calculateApproxLocalResponseTimes(){
         for (Processor p: processors){
-            p.calculateExactLocalResponseTimes();
+            p.calculateApproxLocalResponseTimes();
         }
+        for (Flow f: flows){
+            f.calculateWCRTfromW();
+        }
+    }
 
+    public void calculateExactLocalResponseTime(){
+        for (Processor p: processors){
+            p.calculateExactLocalResponseTime();
+        }
         for (Flow f: flows){
             f.calculateWCRTfromW();
         }

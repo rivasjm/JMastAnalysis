@@ -85,6 +85,7 @@ public class Processor {
         java.lang.System.out.printf("%f", this.getUtilization());
     }
 
+
     // Getter and Setters
 
     public Integer getId() {
@@ -132,28 +133,60 @@ public class Processor {
         }
     }
 
-    // Deadline monotonic priority assignment
     public void setDeadlineMonotonicPriorities(){
-        // Sort tasks according to their scheduling deadlines (fisrt task has larger SD)
-        tasks.sort((t1, t2) ->  Double.compare(t2.getSchedulingDeadline(), t1.getSchedulingDeadline()));
+        // Deadline monotonic priority assignment
+        tasks.sort((t1, t2) ->  Double.compare(t2.getSchedulingDeadline(), t1.getSchedulingDeadline())); // Sort tasks according to their scheduling deadlines (fisrt task has larger SD)
         for (int i=0; i<tasks.size(); i++){
             tasks.get(i).setPriority(i+1);
         }
     }
 
-    // Exact response time analysis (for independent tasks)
-    public void calculateExactLocalResponseTimes(){
-        // Sort tasks list according to their priorities (first task has higher priority)
-        tasks.sort((t1, t2) -> t2.getPriority()-t1.getPriority());
-        for (int n=1; n<=tasks.size(); n++){
-            Double sum = 0.0;
-            Double underAnalysisPeriod = tasks.get(n-1).getFlow().getPeriod();
-            for (int i=1; i<=n; i++){
-                Double currentWCET = tasks.get(i-1).getWcet();
-                Double currentPeriod = tasks.get(i-1).getFlow().getPeriod();
-                sum += currentWCET + ceil(currentPeriod/underAnalysisPeriod);
+    public List<Task> getInterferentTasks(Task aTask){
+        // Returns list of tasks with higher or equal priority than t in the processor (excluding t)
+        List<Task> interferent = new ArrayList<>();
+        for (Task t: tasks){
+            if ((t.getPriority() >= aTask.getPriority()) && (t != aTask)) {
+                interferent.add(t);
             }
-            tasks.get(n-1).setW(sum);
+        }
+        return interferent;
+    }
+
+    public void calculateApproxLocalResponseTimes(){
+        // Approximate response time analysis for independent tasks
+        for (Task t: tasks){
+            Double sum = t.getWcet();
+            Double periodAnalysis = t.getFlow().getPeriod();
+
+            List<Task> interferent = getInterferentTasks(t);
+            for (Task it: interferent){
+                Double periodCurrent = it.getFlow().getPeriod();
+                Double wcetCurrent = it.getWcet();
+                sum += ceil(periodCurrent/periodAnalysis)*wcetCurrent;
+            }
+            t.setW(sum);
+        }
+    }
+
+    public void calculateExactLocalResponseTime(){
+        // Exact response time analysis for independent tasks
+
+        for (Task ta: tasks){ // Task under analysis
+            List<Task> interferent = getInterferentTasks(ta);
+
+            double wcant = ta.getWcet();
+            double wc;
+            while (true){
+                wc = ta.getWcet();
+                for (Task ti: interferent) {
+                    double periodCurrent = ti.getFlow().getPeriod();
+                    double wcetCurrent = ti.getWcet();
+                    wc += ceil(wcant/periodCurrent)*wcetCurrent;
+                }
+                if (wc == wcant) break;
+                else wcant = wc;
+            }
+            ta.setW(wc);
         }
     }
 

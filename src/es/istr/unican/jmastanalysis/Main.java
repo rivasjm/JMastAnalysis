@@ -27,10 +27,10 @@ public class Main {
         UtilizationConfig u = new UtilizationConfig();
         s.setSeed(10);
         s.setnProcs(1);
-        s.setnFlows(2);
-        s.setnTasks(2);
+        s.setnFlows(20);
+        s.setnTasks(7);
         s.setRandomLength(false);
-        s.setSingleFlows(0f);
+        s.setSingleFlows(100f);
         s.setSchedPolicy("FP");
         s.setLocalization(LocalizationOptions.RANDOM);
         p.setBase(10f);
@@ -43,7 +43,7 @@ public class Main {
         u.setStart(10);
         u.setStep(1);
         u.setTop(80);
-        u.setCurrentU(10);
+        u.setCurrentU(50);
         s.setUtilization(u);
         DeadlineConfig d = new DeadlineConfig("NT");
         s.setDeadline(d);
@@ -53,7 +53,8 @@ public class Main {
         HOSPAConfig h = new HOSPAConfig();
         m.setName("Ejemplo");
         m.setWorkPath(".");
-        m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
+        //m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
+        m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
         m.setAnalysis(AnalysisOptions.HOLISTIC);
         m.setSync(false);
         m.setAssignment(AssignmentOptions.NONE);
@@ -64,12 +65,22 @@ public class Main {
         m.setCalculateSlack(false);
         m.setJitterAvoidance(false);
 
-        // Exact analysis for independent tasks
+        // Generate System
         MastSystem sys = new MastSystem(s);
         sys.setPDPriorities();
-        sys.calculateExactResponseTimes();
+        System.out.println("System Overview");
         sys.printOverview();
         System.out.println("");
+
+        // Approximate analysis for independent tasks
+        sys.calculateApproxLocalResponseTimes();
+        System.out.println("Approximate analysis for independent tasks");
+        sys.printResultsOverview();
+        System.out.println(sys.getSystemSchedIndex());
+        System.out.println("");
+
+        // Exact analysis for independent tasks
+        sys.calculateExactLocalResponseTime();
         System.out.println("Exact analysis for independent tasks");
         sys.printResultsOverview();
         System.out.println(sys.getSystemSchedIndex());
