@@ -38,11 +38,18 @@ public class Flow {
             case RANDOM:
                 ArrayList<Integer> shuffledProcIndexes =
                         new ArrayList<>(Utils.shuffleToList(procs.size(), tasks.size(), r));
-
                 for (int i = 0; i < tasks.size(); i++) {
                     tasks.get(i).setProcessor(procs.get(shuffledProcIndexes.get(i)));
                 }
 
+                break;
+
+            case RANDOM_B:
+                // Completely random assignment, without common seed
+                for (Task t: tasks){
+                    int randomProcIndex = Utils.getRandomInt(0, procs.size()-1);
+                    t.setProcessor(procs.get(randomProcIndex));
+                }
                 break;
 
             case AVOID_CONSECUTIVE:

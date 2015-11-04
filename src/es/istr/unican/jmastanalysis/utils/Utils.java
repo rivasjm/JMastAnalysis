@@ -74,6 +74,10 @@ public class Utils {
         return new Random().nextInt(max-min+1)+min;
     }
 
+    public static int getRandomInt(int min, int max, Random r) {
+        return r.nextInt(max-min+1)+min;
+    }
+
 
     public static void main(String[] args) {
 

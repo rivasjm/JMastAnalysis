@@ -5,6 +5,7 @@ import es.istr.unican.jmastanalysis.analysis.config.AnalysisOptions;
 import es.istr.unican.jmastanalysis.analysis.config.AssignmentOptions;
 import es.istr.unican.jmastanalysis.analysis.config.HOSPAConfig;
 import es.istr.unican.jmastanalysis.analysis.config.MastConfig;
+import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
 import es.istr.unican.jmastanalysis.system.MastSystem;
 import es.istr.unican.jmastanalysis.system.config.SystemConfig;
 import es.istr.unican.jmastanalysis.system.config.deadline.DeadlineConfig;
@@ -53,8 +54,8 @@ public class Main {
         HOSPAConfig h = new HOSPAConfig();
         m.setName("Ejemplo");
         m.setWorkPath(".");
-        //m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
-        m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
+        m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
+        //m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
         m.setAnalysis(AnalysisOptions.HOLISTIC);
         m.setSync(false);
         m.setAssignment(AssignmentOptions.NONE);
@@ -88,7 +89,11 @@ public class Main {
 
         // Holistic Analysis
         System.out.println("Holistic analysis");
-        MastTool.analyze(sys, m);
+        try {
+            MastTool.analyze(sys, m);
+        } catch (InterruptedAnalysis interruptedAnalysis) {
+            interruptedAnalysis.printStackTrace();
+        }
         sys.printResultsOverview();
         System.out.println(sys.getSystemSchedIndex());
         System.out.println("");

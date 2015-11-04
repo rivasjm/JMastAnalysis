@@ -5,6 +5,7 @@ import es.istr.unican.jmastanalysis.analysis.config.AnalysisOptions;
 import es.istr.unican.jmastanalysis.analysis.config.AssignmentOptions;
 import es.istr.unican.jmastanalysis.analysis.config.HOSPAConfig;
 import es.istr.unican.jmastanalysis.analysis.config.MastConfig;
+import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
 import es.istr.unican.jmastanalysis.system.MastSystem;
 import es.istr.unican.jmastanalysis.system.config.SystemConfig;
 import es.istr.unican.jmastanalysis.system.config.deadline.DeadlineConfig;
@@ -27,67 +28,25 @@ import java.sql.PreparedStatement;
  */
 public class compare {
 
-    private static String dbName = "results.db";
-
-    public static void createTable(){
-        Connection con = null;
-        Statement stm = null;
-        try{
-            Class.forName("org.sqlite.JDBC");
-            con = DriverManager.getConnection(String.format("jdbc:sqlite:%s", dbName));
-
-            stm = con.createStatement();
-            String sql = "CREATE TABLE RESULTS "+
-                    "(SEED_A INT, NTASKS_A INT, U_A INT, SEED_B INT, NTASKS_B INT, U_B INT," +
-                    "OPT BIT, HOL BIT, EXACT BIT, APPROX BIT," +
-                    "TIME_HOL REAL, TIME_EXACT REAL, TIME_APPROX REAL";
-            stm.executeUpdate(sql);
-            stm.close();
-            con.close();
-            System.out.println("Table created");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void addRow(int seedA, int ntasksA, int uA, int seedB, int ntasksB, int uB,
-                              boolean opt, boolean hol, boolean exact, boolean approx,
-                              double timeHol, double timeExact, double timeApprox) {
-        Connection con = null;
-        PreparedStatement p = null;
-        try{
-            Class.forName("org.sqlite.JDBC");
-            con = DriverManager.getConnection(String.format("jdbc:sqlite:%s", dbName));
-
-            String query = "INSERT INTO RESULTS (SEED,NTASKS,U,SI_OPT,SI_HOL,SI_EXACT,SI_APPROX,TIME_HOL,TIME_EXACT,TIME_APPROX) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-            p = con.prepareStatement(query);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void main(String[] args) {
         // System Configuration
         SystemConfig s = new SystemConfig();
         PeriodConfig p = new PeriodConfig();
         UtilizationConfig u = new UtilizationConfig();
         //s.setSeed(10);
-        s.setnProcs(1);
-        s.setnFlows(10);
+        s.setnProcs(3);
+        s.setnFlows(5);
         //s.setnTasks(7);
         s.setRandomLength(false);
         s.setSingleFlows(0f);
         s.setSchedPolicy("FP");
-        s.setLocalization(LocalizationOptions.RANDOM);
+        //s.setLocalization(LocalizationOptions.RANDOM);
         p.setBase(10f);
         p.setDistribution(PeriodDistributionOptions.UNIFORM);
-        p.setRatio(100f);
+        p.setRatio(10f);
         s.setPeriod(p);
         u.setBalancing(LoadBalancingOptions.BALANCED);
-        u.setWcetMethod(WCETGenerationOptions.SCALE);
+        u.setWcetMethod(WCETGenerationOptions.UUNIFAST);
         u.setBcetFactor(0f);
         u.setStart(10);
         u.setStep(1);
@@ -102,13 +61,13 @@ public class compare {
         HOSPAConfig h = new HOSPAConfig();
         m.setName("Ejemplo");
         m.setWorkPath(".");
-        //m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
-        m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
+        m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
+        //m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
         //m.setAnalysis(AnalysisOptions.HOLISTIC);
         m.setSync(false);
         m.setAssignment(AssignmentOptions.NONE);
         m.setHospaConfig(h);
-        m.setStopFactor(100.0f);
+        m.setStopFactor(10.0f);
         m.setGsd(false);
         m.setDsFactor(1);
         m.setCalculateSlack(false);
@@ -122,90 +81,101 @@ public class compare {
 
         MastSystem sysA = null;
         MastSystem sysB = null;
-        for (int seed=1; seed<=100; seed++){
+        for (int seed=1000; seed<=1100; seed++){
 
             s.setSeed(seed);
+            int ntasks = Utils.getRandomInt(3, 10);
+            int utilization = Utils.getRandomInt(10, 60);
+            s.setnTasks(ntasks);
+            u.setCurrentU(utilization);
+            s.setUtilization(u);
+
+            System.out.printf("%4d (L=%2d U=%2d)\tA -> opt=",
+                    seed,
+                    ntasks, utilization);
 
             // System A
 
-            int ntasks_A = Utils.getRandomInt(2, 10);
-            int u_A = Utils.getRandomInt(10, 60);
-            //System.out.printf("A: L=%d U=%d || ", ntasks_A, u_A);
-            s.setnTasks(ntasks_A);
-            u.setCurrentU(u_A);
-            s.setUtilization(u);
-
+            s.setLocalization(LocalizationOptions.RANDOM_B);
             sysA = new MastSystem(s);
+            //System.out.println("System A");
+            //sysA.printOverview();
             sysA.setPDPriorities();
-            m.setAnalysis(AnalysisOptions.OFFSET_OPT);
-            MastTool.analyze(sysA, m);
-            Double siOptA = sysA.getSystemSchedIndex();
 
-            sysA = new MastSystem(s);
-            sysA.setPDPriorities();
-            m.setAnalysis(AnalysisOptions.HOLISTIC);
-            MastTool.analyze(sysA, m);
-            Double siHolA = sysA.getSystemSchedIndex();
+            try {
+                m.setAnalysis(AnalysisOptions.OFFSET_OPT);
+                MastTool.analyze(sysA, m);
+                Double siOptA = sysA.getSystemSchedIndex();
+                System.out.printf("%2.2f hol=", siOptA);
 
-            sysA = new MastSystem(s);
-            sysA.setPDPriorities();
-            sysA.calculateApproxLocalResponseTimes();
-            Double siApproxA = sysA.getSystemSchedIndex();
+                sysA = new MastSystem(s);
+                sysA.setPDPriorities();
+                m.setAnalysis(AnalysisOptions.HOLISTIC);
+                MastTool.analyze(sysA, m);
+                Double siHolA = sysA.getSystemSchedIndex();
+                System.out.printf("%2.2f exact=", siHolA);
 
-            sysA = new MastSystem(s);
-            sysA.setPDPriorities();
-            sysA.calculateExactLocalResponseTime();
-            Double siExactA = sysA.getSystemSchedIndex();
+                sysA = new MastSystem(s);
+                sysA.setPDPriorities();
+                sysA.calculateExactLocalResponseTime();
+                Double siExactA = sysA.getSystemSchedIndex();
+                System.out.printf("%2.2f approx=", siExactA);
 
-
-            // System B
-
-            int ntasks_B = Utils.getRandomInt(2, 10);
-            int u_B = Utils.getRandomInt(10, 70);
-            //System.out.printf("B: L=%d U=%d\n", ntasks_B, u_B);
-            s.setnTasks(ntasks_B);
-            u.setCurrentU(u_B);
-            s.setUtilization(u);
-
-            sysB = new MastSystem(s);
-            sysB.setPDPriorities();
-            m.setAnalysis(AnalysisOptions.OFFSET_OPT);
-            MastTool.analyze(sysB, m);
-            Double siOptB = sysB.getSystemSchedIndex();
-
-            sysB = new MastSystem(s);
-            sysB.setPDPriorities();
-            m.setAnalysis(AnalysisOptions.HOLISTIC);
-            MastTool.analyze(sysB, m);
-            Double siHolB = sysB.getSystemSchedIndex();
-
-            sysB = new MastSystem(s);
-            sysB.setPDPriorities();
-            sysB.calculateApproxLocalResponseTimes();
-            Double siApproxB = sysB.getSystemSchedIndex();
-
-            sysB = new MastSystem(s);
-            sysB.setPDPriorities();
-            sysB.calculateExactLocalResponseTime();
-            Double siExactB = sysB.getSystemSchedIndex();
-
-            System.out.printf("%d\tA(L=%2d U=%2d) -> opt=%2.2f hol=%2.2f exact=%2.2f approx=%2.2f\n\tB(L=%2d U=%2d) -> opt=%2.2f hol=%2.2f exact=%2.2f approx=%2.2f\n",
-                    seed,
-                    ntasks_A, u_A, siOptA, siHolA, siExactA, siApproxA,
-                    ntasks_B, u_B, siOptB, siHolB, siExactB, siApproxB);
+                sysA = new MastSystem(s);
+                sysA.setPDPriorities();
+                sysA.calculateApproxLocalResponseTimes();
+                Double siApproxA = sysA.getSystemSchedIndex();
+                System.out.printf("%2.2f\n\t\t\t\t\tB -> opt=", siApproxA);
 
 
-            // Comparamos A y B
+                // System B
 
-            boolean ref = siOptA > siOptB; // usamos optimized analysis como referencia
-            boolean hol = siHolA > siHolB;
-            boolean exact = siExactA > siExactB;
-            boolean approx = siApproxA > siApproxB;
+                s.setLocalization(LocalizationOptions.RANDOM_B);
+                sysB = new MastSystem(s);
+                //System.out.println("System B");
+                //sysB.printOverview();
+                sysB.setPDPriorities();
 
-            if (ref == ref) agreeOpt += 1; // as reference
-            if (hol == ref) agreeHol += 1;
-            if (exact == ref) agreeExact += 1;
-            if (approx == ref) agreeApprox += 1;
+                m.setAnalysis(AnalysisOptions.OFFSET_OPT);
+                MastTool.analyze(sysB, m);
+                Double siOptB = sysB.getSystemSchedIndex();
+                System.out.printf("%2.2f hol=", siOptB);
+
+                sysB = new MastSystem(s);
+                sysB.setPDPriorities();
+                m.setAnalysis(AnalysisOptions.HOLISTIC);
+                MastTool.analyze(sysB, m);
+                Double siHolB = sysB.getSystemSchedIndex();
+                System.out.printf("%2.2f exact=", siHolB);
+
+                sysB = new MastSystem(s);
+                sysB.setPDPriorities();
+                sysB.calculateExactLocalResponseTime();
+                Double siExactB = sysB.getSystemSchedIndex();
+                System.out.printf("%2.2f approx=", siExactB);
+
+                sysB = new MastSystem(s);
+                sysB.setPDPriorities();
+                sysB.calculateApproxLocalResponseTimes();
+                Double siApproxB = sysB.getSystemSchedIndex();
+                System.out.printf("%2.2f\n", siApproxB);
+
+                // Comparamos A y B
+
+                boolean ref = siOptA > siOptB; // usamos optimized analysis como referencia
+                boolean hol = siHolA > siHolB;
+                boolean exact = siExactA > siExactB;
+                boolean approx = siApproxA > siApproxB;
+
+                if (ref == ref) agreeOpt += 1; // as reference
+                if (hol == ref) agreeHol += 1;
+                if (exact == ref) agreeExact += 1;
+                if (approx == ref) agreeApprox += 1;
+
+            }  catch (InterruptedAnalysis e){
+                e.printStackTrace();
+                System.out.println("INTERRUPTED");
+            }
         }
 
         System.out.println("\nConclusiones");

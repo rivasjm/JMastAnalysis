@@ -6,7 +6,10 @@ import es.istr.unican.jmastanalysis.analysis.config.MastConfig;
 import es.istr.unican.jmastanalysis.analysis.results.REALTIMESITUATION;
 import es.istr.unican.jmastanalysis.analysis.results.TimingResult;
 import es.istr.unican.jmastanalysis.analysis.results.TransactionResults;
+import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
 import es.istr.unican.jmastanalysis.system.MastSystem;
+import es.istr.unican.jmastanalysis.system.config.SystemConfig;
+import es.istr.unican.jmastanalysis.utils.ProcessTimeoutThread;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.xml.bind.JAXBContext;
@@ -18,13 +21,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by juanm on 19/08/2015.
  */
 public class MastTool {
 
-    public static void analyze(MastSystem system, MastConfig config) {
+    public static void analyze(MastSystem system, MastConfig config) throws InterruptedAnalysis{
 
 
         // Checks if mast_analysis.exe exists, and is executable
@@ -115,7 +119,26 @@ public class MastTool {
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
             while ((reader.readLine()) != null) {}
 
-            p.waitFor();
+            // Rudimentary timeout for offset based optimized analysis
+//            if (config.getAnalysis()==AnalysisOptions.OFFSET_OPT) {
+//
+//                Thread.sleep(1000L);
+//                BufferedReader reader2 =
+//                        new BufferedReader(new InputStreamReader(p.getInputStream()));
+//                while ((reader2.readLine()) != null) {}
+//                int status = 0;
+//                try {
+//                    status = p.exitValue();
+//                } catch (IllegalThreadStateException e) {
+//                    p.destroy();
+//                    throw new InterruptedAnalysis(Integer.toString(status));
+//                }
+//            }
+
+            if (!p.waitFor(1, TimeUnit.SECONDS)){
+                p.destroy();
+                throw new InterruptedAnalysis("");
+            }
 
 //            System.out.println(cmd);
 //            String text = IOUtils.toString(p.getInputStream(), StandardCharsets.UTF_8.name());
