@@ -37,10 +37,10 @@ public class compare {
         s.setnProcs(3);
         s.setnFlows(5);
         //s.setnTasks(7);
-        s.setRandomLength(false);
+        s.setRandomLength(true);
         s.setSingleFlows(0f);
         s.setSchedPolicy("FP");
-        //s.setLocalization(LocalizationOptions.RANDOM);
+        s.setLocalization(LocalizationOptions.RANDOM_B);
         p.setBase(10f);
         p.setDistribution(PeriodDistributionOptions.UNIFORM);
         p.setRatio(10f);
@@ -61,8 +61,8 @@ public class compare {
         HOSPAConfig h = new HOSPAConfig();
         m.setName("Ejemplo");
         m.setWorkPath(".");
-        m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
-        //m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
+        //m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
+        m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
         //m.setAnalysis(AnalysisOptions.HOLISTIC);
         m.setSync(false);
         m.setAssignment(AssignmentOptions.NONE);
@@ -81,11 +81,11 @@ public class compare {
 
         MastSystem sysA = null;
         MastSystem sysB = null;
-        for (int seed=1000; seed<=1100; seed++){
+        for (int seed=1; seed<=100; seed++){
 
             s.setSeed(seed);
             int ntasks = Utils.getRandomInt(3, 10);
-            int utilization = Utils.getRandomInt(10, 60);
+            int utilization = Utils.getRandomInt(10, 70);
             s.setnTasks(ntasks);
             u.setCurrentU(utilization);
             s.setUtilization(u);
@@ -94,15 +94,13 @@ public class compare {
                     seed,
                     ntasks, utilization);
 
-            // System A
-
-            s.setLocalization(LocalizationOptions.RANDOM_B);
-            sysA = new MastSystem(s);
-            //System.out.println("System A");
-            //sysA.printOverview();
-            sysA.setPDPriorities();
-
             try {
+                // System A
+                sysA = new MastSystem(s);
+                //System.out.println("System A");
+                //sysA.printOverview();
+                sysA.setPDPriorities();
+
                 m.setAnalysis(AnalysisOptions.OFFSET_OPT);
                 MastTool.analyze(sysA, m);
                 Double siOptA = sysA.getSystemSchedIndex();
@@ -130,7 +128,6 @@ public class compare {
 
                 // System B
 
-                s.setLocalization(LocalizationOptions.RANDOM_B);
                 sysB = new MastSystem(s);
                 //System.out.println("System B");
                 //sysB.printOverview();
@@ -173,7 +170,7 @@ public class compare {
                 if (approx == ref) agreeApprox += 1;
 
             }  catch (InterruptedAnalysis e){
-                e.printStackTrace();
+                //e.printStackTrace();
                 System.out.println("INTERRUPTED");
             }
         }

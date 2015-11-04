@@ -9,4 +9,7 @@ public class InterruptedAnalysis extends Exception {
         super(msg);
     }
 
+    public InterruptedAnalysis(){
+        super();
+    }
 }

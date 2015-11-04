@@ -36,10 +36,8 @@ public class Utils {
         return d;
     }
 
-    /*
-        Creates an array of numbers from first to last: [first, first+1, ..., last]
-     */
     public static Integer[] range(int first, int last) {
+        //Creates an array of numbers from first to last: [first, first+1, ..., last]
         if (last < first) {
             return new Integer[0];
         }
@@ -50,12 +48,8 @@ public class Utils {
         return numbers;
     }
 
-
-    /*
-        shuffles [1, 2, .., inputRangeLength] to an array of length outputLength (output can be longer or shorter)
-     */
     public static List<Integer> shuffleToList(int inputRangeLength, int outputLength, Random r) {
-
+        //shuffles [1, 2, .., inputRangeLength] to an array of length outputLength (output can be longer or shorter)
         ArrayList<Integer> input = new ArrayList<Integer>(Arrays.asList(range(0, inputRangeLength - 1)));   // Create input range of values [1, 2, 3, ..., inputRangeLength
 
         // Shuffle input
@@ -71,13 +65,12 @@ public class Utils {
     }
 
     public static int getRandomInt(int min, int max) {
-        return new Random().nextInt(max-min+1)+min;
+        return new Random().nextInt(max - min + 1) + min;
     }
 
     public static int getRandomInt(int min, int max, Random r) {
-        return r.nextInt(max-min+1)+min;
+        return r.nextInt(max - min + 1) + min;
     }
-
 
     public static void main(String[] args) {
 

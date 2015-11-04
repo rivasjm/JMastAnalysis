@@ -8,20 +8,15 @@ import es.istr.unican.jmastanalysis.analysis.results.TimingResult;
 import es.istr.unican.jmastanalysis.analysis.results.TransactionResults;
 import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
 import es.istr.unican.jmastanalysis.system.MastSystem;
-import es.istr.unican.jmastanalysis.system.config.SystemConfig;
-import es.istr.unican.jmastanalysis.utils.ProcessTimeoutThread;
+import org.apache.commons.exec.*;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by juanm on 19/08/2015.
@@ -90,72 +85,63 @@ public class MastTool {
         //Store tool configuration in system
         system.setToolConfig(config);
 
-        //Execute MAST Tool
-        long beforeTime = System.nanoTime();
-        Runtime r = Runtime.getRuntime();
-        Process p = null;
-
-        //Check if input file is not yet created
-//        while (true) {
-//            System.out.println(inputFilePath);
-//            System.out.println("File length: "+new File(inputFilePath).length());
-//            break;
-//        }
-
         try {
-            p = r.exec(cmd);
-
-            // IMPORTANTE: Cuando ejecuto el analisis de un sistema grande, el proceso nunca regresa. Esto ocurre pq la
-            // salida del proceso es demasiado grande, y necesita ser leida para vaciar los bufferes.
-            // (cuanto mas grande es el sistema, mas grande es lo que sale por pantalla cuando se analiza).
-            // Leyendo el inputstream del proceso, vacio los bufferes, y el proceso puede finalizar.
-            // java.lang
-            // Class Process
-            // Because some native platforms only provide limited buffer size for standard input and output streams,
-            // failure to promptly write the input stream or read the output stream of the subprocess may cause the
-            // subprocess to block, and even deadlock.
-
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
-            while ((reader.readLine()) != null) {}
-
-            // Rudimentary timeout for offset based optimized analysis
-//            if (config.getAnalysis()==AnalysisOptions.OFFSET_OPT) {
-//
-//                Thread.sleep(1000L);
-//                BufferedReader reader2 =
-//                        new BufferedReader(new InputStreamReader(p.getInputStream()));
-//                while ((reader2.readLine()) != null) {}
-//                int status = 0;
-//                try {
-//                    status = p.exitValue();
-//                } catch (IllegalThreadStateException e) {
-//                    p.destroy();
-//                    throw new InterruptedAnalysis(Integer.toString(status));
-//                }
-//            }
-
-            if (!p.waitFor(1, TimeUnit.SECONDS)){
-                p.destroy();
-                throw new InterruptedAnalysis("");
-            }
-
-//            System.out.println(cmd);
-//            String text = IOUtils.toString(p.getInputStream(), StandardCharsets.UTF_8.name());
-//            System.out.println(text);
-
+            //Execute MAST Tool
+            long beforeTime = System.nanoTime();
+            launchCommand(cmd, 10000L, null);
             long afterTime = System.nanoTime();
+
+            //Integrate results
             integrateMASTResults(new File(outputFilePath), system);
             system.setToolTimeElapsed(afterTime - beforeTime);
-
+        } catch (InterruptedAnalysis e){
+            throw e;
+        } finally {
             // Detele files
             new File(inputFilePath).delete();
             new File(outputFilePath).delete();
             new File("mast_parser.lis").delete();
+        }
+    }
 
-        } catch (IOException | InterruptedException e) {
-            System.out.println("ERROR executing :" + cmd);
-            e.printStackTrace();
+    public static void launchCommand(String command, Long timeoutSeconds, String stdOutputFile) throws InterruptedAnalysis{
+        try {
+            // Define executor
+            CommandLine commandLine = CommandLine.parse(command);
+            DefaultExecutor executor = new DefaultExecutor();
+            executor.setExitValue(1);
+
+            // Standard Output Handling
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+            executor.setStreamHandler(streamHandler);
+
+            ExecuteWatchdog dog = null;
+            if (timeoutSeconds != null) {
+                // Define watchdog (for timeout)
+                dog = new ExecuteWatchdog(timeoutSeconds);
+                executor.setWatchdog(dog);
+            }
+
+            // Execute command
+            int exitValue = executor.execute(commandLine);
+
+            if (stdOutputFile != null){
+                // Save standard output of the process
+                OutputStream fileOutput = new FileOutputStream(stdOutputFile);
+                outputStream.writeTo(fileOutput);
+            }
+
+            if (dog != null){
+                if (dog.killedProcess()){
+                    throw new InterruptedAnalysis();
+                }
+            }
+
+        } catch (ExecuteException e){
+            //e.printStackTrace();
+        } catch (IOException e){
+            //e.printStackTrace();
         }
     }
 
@@ -200,4 +186,5 @@ public class MastTool {
             e.printStackTrace();
         }
     }
+
 }
