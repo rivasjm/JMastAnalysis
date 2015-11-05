@@ -162,7 +162,24 @@ public class Processor {
             for (Task it: interferent){
                 Double periodCurrent = it.getFlow().getPeriod();
                 Double wcetCurrent = it.getWcet();
-                sum += ceil(periodCurrent/periodAnalysis)*wcetCurrent;
+                sum += ceil(periodAnalysis/periodCurrent)*wcetCurrent;
+            }
+            t.setW(sum);
+        }
+    }
+
+    public void calculateApproxDeadlinesLocalResponseTimes(){
+        // Approximate response time analysis for independent tasks, for D>T
+        for (Task t: tasks){
+            Double sum = t.getWcet();
+            Double periodAnalysis = t.getFlow().getPeriod();
+            Double deadlineAnalysis = t.getFlow().getDeadline();
+
+            List<Task> interferent = getInterferentTasks(t);
+            for (Task it: interferent){
+                Double periodCurrent = it.getFlow().getPeriod();
+                Double wcetCurrent = it.getWcet();
+                sum += ceil(deadlineAnalysis/periodCurrent)*wcetCurrent;
             }
             t.setW(sum);
         }

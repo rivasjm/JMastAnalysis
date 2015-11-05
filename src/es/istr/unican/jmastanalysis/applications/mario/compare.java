@@ -1,4 +1,4 @@
-package es.istr.unican.jmastanalysis.applications;
+package es.istr.unican.jmastanalysis.applications.mario;
 
 import es.istr.unican.jmastanalysis.analysis.MastTool;
 import es.istr.unican.jmastanalysis.analysis.config.AnalysisOptions;

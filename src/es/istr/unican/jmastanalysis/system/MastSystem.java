@@ -153,6 +153,15 @@ public class MastSystem {
         }
     }
 
+    public void calculateApproxDeadlinesLocalResponseTimes(){
+        for (Processor p: processors){
+            p.calculateApproxDeadlinesLocalResponseTimes();
+        }
+        for (Flow f: flows){
+            f.calculateWCRTfromW();
+        }
+    }
+
     public void calculateExactLocalResponseTime(){
         for (Processor p: processors){
             p.calculateExactLocalResponseTime();
