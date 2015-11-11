@@ -100,6 +100,16 @@ public class MastConfig {
 
     public MastConfig() {
         super();
+        this.name = "MAST analysis";
+        this.workPath = ".";
+        this.mastPath = "mast_analysis.exe";
+        this.sync = true;
+        this.hospaConfig = new HOSPAConfig();
+        this.stopFactor = 10.0f;
+        this.gsd = false;
+        this.dsFactor = 1;
+        this.calculateSlack = false;
+        this.jitterAvoidance = false;
     }
 
 

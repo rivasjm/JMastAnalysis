@@ -1,11 +1,10 @@
 package es.istr.unican.jmastanalysis.system;
 
+import es.istr.unican.jmastanalysis.exceptions.InvalidSchedulingPolicy;
 import es.istr.unican.jmastanalysis.system.config.load.WCETGenerationOptions;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.pow;
@@ -17,11 +16,17 @@ public class Processor {
 
     private Integer id;
     private String schedulingPolicy;
-    private List<Task> tasks;
+    private Set<Task> tasks;
 
 
-    public Processor() {
-        tasks = new ArrayList<>();
+    public Processor(){
+        super();
+    }
+
+    public Processor(Integer id, String schedPolicy) {
+        this.id = id;
+        setSchedulingPolicy(schedPolicy);
+        tasks = new HashSet<>();
     }
 
     public void addTask(Task aTask) {
@@ -41,6 +46,7 @@ public class Processor {
     }
 
     public void setUtilization(WCETGenerationOptions o, Double u, Random r) {
+        ArrayList<Task> tasksList = new ArrayList<>(tasks);
         switch (o) {
             case SCALE:
                 for (Task t : tasks) {
@@ -54,12 +60,12 @@ public class Processor {
                 for (Task t : tasks) {
 
                     // Last task in the list
-                    if (tasks.indexOf(t) + 1 == tasks.size()) {
+                    if (tasksList.indexOf(t) + 1 == tasks.size()) {
                         t.setWcet(sumU * t.getFlow().getPeriod());
                         break;
                     }
 
-                    nextSumU = sumU * pow(r.nextDouble(), 1.0 / (tasks.size() - tasks.indexOf(t) + 1));
+                    nextSumU = sumU * pow(r.nextDouble(), 1.0 / (tasks.size() - tasksList.indexOf(t) + 1));
                     t.setWcet((sumU - nextSumU) * t.getFlow().getPeriod());
                     sumU = nextSumU;
                 }
@@ -101,7 +107,13 @@ public class Processor {
     }
 
     public void setSchedulingPolicy(String schedulingPolicy) {
-        this.schedulingPolicy = schedulingPolicy;
+
+        if (schedulingPolicy.equals("FP") || schedulingPolicy.equals("EDF")) {
+            this.schedulingPolicy = schedulingPolicy;
+        } else {
+            System.out.println("WARNING: %s scheduling policy not valid. Using FP instead");
+            this.schedulingPolicy = "FP";
+        }
     }
 
     public void writeProcessingResource(PrintWriter pw) {
@@ -135,9 +147,10 @@ public class Processor {
 
     public void setDeadlineMonotonicPriorities(){
         // Deadline monotonic priority assignment
-        tasks.sort((t1, t2) ->  Double.compare(t2.getSchedulingDeadline(), t1.getSchedulingDeadline())); // Sort tasks according to their scheduling deadlines (fisrt task has larger SD)
+        ArrayList<Task> tasksList = new ArrayList<>(tasks);
+        tasksList.sort((t1, t2) ->  Double.compare(t2.getSchedulingDeadline(), t1.getSchedulingDeadline())); // Sort tasks according to their scheduling deadlines (fisrt task has larger SD)
         for (int i=0; i<tasks.size(); i++){
-            tasks.get(i).setPriority(i+1);
+            tasksList.get(i).setPriority(i+1);
         }
     }
 

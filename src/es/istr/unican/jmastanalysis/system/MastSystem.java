@@ -31,11 +31,31 @@ public class MastSystem {
 
     // Public methods
 
+    public MastSystem() {
+        flows = new ArrayList<>();
+        processors = new ArrayList<>();
+        random = new Random();
+    }
+
+    public MastSystem(List<Flow> flowList, List<Processor> procList){
+        flows = flowList;
+        processors = procList;
+        random = new Random();
+    }
+
     public MastSystem(SystemConfig systemConfiguration) {
         flows = new ArrayList<>();
         processors = new ArrayList<>();
         random = new Random(systemConfiguration.getSeed());
         create(systemConfiguration);
+    }
+
+    public void addFlow(Flow newFlow){
+        flows.add(newFlow);
+    }
+
+    public void addProcessor(Processor newProcessor){
+        processors.add(newProcessor);
     }
 
     public MastConfig getToolConfig() {
@@ -104,6 +124,23 @@ public class MastSystem {
             sum += f.getFlowWCRT();
         }
         return sum / this.flows.size();
+    }
+
+    public double[][] getTasksWCRTAsArray() {
+        int maxLength = 0;
+        for (Flow f: flows){
+            maxLength = (f.getTasks().size() > maxLength) ? f.getTasks().size() : maxLength;
+        }
+        double [][] wcrts = new double[flows.size()][maxLength];
+
+        for (int i=0; i<flows.size(); i++){
+            for (int j=0; j< flows.get(i).getTasks().size(); j++){
+                wcrts[i][j] = flows.get(i).getTasks().get(j).getWcrt();
+            }
+        }
+
+        return wcrts;
+
     }
 
     public double getSystemSchedIndex(){

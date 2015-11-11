@@ -25,6 +25,16 @@ public class Task {
     private Double jitter;
     private Double w; //similar to local response time, wcrt is calculated as the sum of the previous w's
 
+    public Task(Double wcet, Double bcet, Integer priority, Processor proc){
+        this.wcet = wcet;
+        this.bcet = bcet;
+        this.priority = priority;
+        setProcessor(proc);
+    }
+
+    public Task(){
+        super();
+    }
 
     // Getters and Setters
 

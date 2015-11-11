@@ -17,13 +17,19 @@ public class Flow {
 
     private Integer id;
 
-
     private Double period;
     private Double deadline;
     private List<Task> tasks;
 
     public Flow() {
         tasks = new ArrayList<>();
+    }
+
+    public Flow(Integer id, Double period, Double deadline){
+        tasks = new ArrayList<>();
+        this.id = id;
+        this.period = period;
+        this.deadline = deadline;
     }
 
     public void addTask(Task aTask) {
@@ -67,6 +73,14 @@ public class Flow {
                 }
                 break;
         }
+    }
+
+    public  void  setPeriod(Double period){
+        this.period = period;
+    }
+
+    public void setDeadline(Double deadline){
+        this.deadline = deadline;
     }
 
     public void setPeriod(PeriodConfig c, Random r) {
