@@ -1,4 +1,4 @@
-package es.istr.unican.jmastanalysis.applications.mario;
+package es.istr.unican.jmastanalysis.examples;
 
 import es.istr.unican.jmastanalysis.analysis.MastTool;
 import es.istr.unican.jmastanalysis.analysis.config.AnalysisOptions;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by juanm on 11/11/2015.
  */
-public class Example {
+public class Mario {
 
     public static void main(String[] args) {
 
