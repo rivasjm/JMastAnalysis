@@ -28,8 +28,8 @@ public class Main {
         UtilizationConfig u = new UtilizationConfig();
         s.setSeed(10);
         s.setnProcs(1);
-        s.setnFlows(20);
-        s.setnTasks(7);
+        s.setnFlows(10);
+        s.setnSteps(7);
         s.setRandomLength(false);
         s.setSingleFlows(100f);
         s.setSchedPolicy("FP");
@@ -54,7 +54,7 @@ public class Main {
         HOSPAConfig h = new HOSPAConfig();
         m.setName("Ejemplo");
         m.setWorkPath(".");
-        m.setMastPath("C:\\Users\\JuanCTR\\CTR\\MAST\\mast_analysis\\exe\\mast_analysis.exe");
+        m.setMastPath("D:\\Development\\JMastAnalysis\\mast_analysis.exe");
         //m.setMastPath("D:\\Development\\MAST\\mast_svn\\mast_analysis.exe");
         m.setAnalysis(AnalysisOptions.HOLISTIC);
         m.setSync(false);
@@ -68,6 +68,7 @@ public class Main {
 
         // Generate System
         MastSystem sys = new MastSystem(s);
+
         sys.setPDPriorities();
         System.out.println("System Overview");
         sys.printOverview();

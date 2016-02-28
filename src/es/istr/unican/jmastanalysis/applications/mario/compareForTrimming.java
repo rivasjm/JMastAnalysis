@@ -38,7 +38,7 @@ public class compareForTrimming {
         //s.setSeed(10);
         s.setnProcs(4);
         s.setnFlows(4);
-        //s.setnTasks(7);
+        //s.setnSteps(7);
         s.setRandomLength(true);
         s.setSingleFlows(0f);
         s.setSchedPolicy("FP");
@@ -106,14 +106,14 @@ public class compareForTrimming {
 
                 // Generates the system
                 s.setSeed(seed);
-                int ntasks = Utils.getRandomInt(10, 15);
+                int nsteps = Utils.getRandomInt(10, 15);
                 int utilization = Utils.getRandomInt(65, 70);
-                s.setnTasks(ntasks);
+                s.setnSteps(nsteps);
                 u.setCurrentU(utilization);
                 s.setUtilization(u);
                 sys = new MastSystem(s);
                 sys.setPDPriorities();
-                System.out.printf("%3d (nTasks=%3d, u=%3d) | opt=", seed, ntasks, utilization);
+                System.out.printf("%3d (nSteps=%3d, u=%3d) | opt=", seed, nsteps, utilization);
 
                 // Offset based optimized (ref)
                 m.setAnalysis(AnalysisOptions.OFFSET_OPT);

@@ -36,7 +36,7 @@ public class compare {
         //s.setSeed(10);
         s.setnProcs(3);
         s.setnFlows(5);
-        //s.setnTasks(7);
+        //s.setnSteps(7);
         s.setRandomLength(true);
         s.setSingleFlows(0f);
         s.setSchedPolicy("FP");
@@ -84,15 +84,15 @@ public class compare {
         for (int seed=1; seed<=100; seed++){
 
             s.setSeed(seed);
-            int ntasks = Utils.getRandomInt(3, 10);
+            int nsteps = Utils.getRandomInt(3, 10);
             int utilization = Utils.getRandomInt(10, 70);
-            s.setnTasks(ntasks);
+            s.setnSteps(nsteps);
             u.setCurrentU(utilization);
             s.setUtilization(u);
 
             System.out.printf("%4d (L=%2d U=%2d)\tA -> opt=",
                     seed,
-                    ntasks, utilization);
+                    nsteps, utilization);
 
             try {
                 // System A

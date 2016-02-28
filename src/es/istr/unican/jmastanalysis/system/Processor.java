@@ -1,6 +1,5 @@
 package es.istr.unican.jmastanalysis.system;
 
-import es.istr.unican.jmastanalysis.exceptions.InvalidSchedulingPolicy;
 import es.istr.unican.jmastanalysis.system.config.load.WCETGenerationOptions;
 
 import java.io.PrintWriter;
@@ -16,21 +15,22 @@ public class Processor {
 
     private Integer id;
     private String schedulingPolicy;
-    private Set<Task> tasks;
+    private Set<Step> steps;
 
 
     public Processor(){
         super();
+        steps = new HashSet<>();
     }
 
     public Processor(Integer id, String schedPolicy) {
         this.id = id;
         setSchedulingPolicy(schedPolicy);
-        tasks = new HashSet<>();
+        steps = new HashSet<>();
     }
 
-    public void addTask(Task aTask) {
-        tasks.add(aTask);
+    public void addStep(Step aStep) {
+        steps.add(aStep);
     }
 
 
@@ -40,32 +40,32 @@ public class Processor {
         /*
         Scales the utilization of the processor by a factor of "factor"
          */
-        for (Task t : tasks) {
+        for (Step t : steps) {
             t.setWcet(t.getWcet() * factor);
         }
     }
 
     public void setUtilization(WCETGenerationOptions o, Double u, Random r) {
-        ArrayList<Task> tasksList = new ArrayList<>(tasks);
+        ArrayList<Step> stepsList = new ArrayList<>(steps);
         switch (o) {
             case SCALE:
-                for (Task t : tasks) {
-                    t.setWcet(u * t.getFlow().getPeriod() / tasks.size());
+                for (Step t : steps) {
+                    t.setWcet(u * t.getFlow().getPeriod() / steps.size());
                 }
                 break;
 
             case UUNIFAST:
                 Double sumU = u;
                 Double nextSumU;
-                for (Task t : tasks) {
+                for (Step t : steps) {
 
-                    // Last task in the list
-                    if (tasksList.indexOf(t) + 1 == tasks.size()) {
+                    // Last step in the list
+                    if (stepsList.indexOf(t) + 1 == steps.size()) {
                         t.setWcet(sumU * t.getFlow().getPeriod());
                         break;
                     }
 
-                    nextSumU = sumU * pow(r.nextDouble(), 1.0 / (tasks.size() - tasksList.indexOf(t) + 1));
+                    nextSumU = sumU * pow(r.nextDouble(), 1.0 / (steps.size() - stepsList.indexOf(t) + 1));
                     t.setWcet((sumU - nextSumU) * t.getFlow().getPeriod());
                     sumU = nextSumU;
                 }
@@ -74,14 +74,14 @@ public class Processor {
     }
 
     public void setBestCaseUtilization(Float factor) {
-        for (Task t : tasks) {
+        for (Step t : steps) {
             t.setBcet(t.getWcet() * factor);
         }
     }
 
     public Double getUtilization() {
         Double u = 0.0;
-        for (Task t : tasks) {
+        for (Step t : steps) {
             u += t.getWcet() / t.getFlow().getPeriod();
         }
         return u;
@@ -147,18 +147,18 @@ public class Processor {
 
     public void setDeadlineMonotonicPriorities(){
         // Deadline monotonic priority assignment
-        ArrayList<Task> tasksList = new ArrayList<>(tasks);
-        tasksList.sort((t1, t2) ->  Double.compare(t2.getSchedulingDeadline(), t1.getSchedulingDeadline())); // Sort tasks according to their scheduling deadlines (fisrt task has larger SD)
-        for (int i=0; i<tasks.size(); i++){
-            tasksList.get(i).setPriority(i+1);
+        ArrayList<Step> stepsList = new ArrayList<>(steps);
+        stepsList.sort((t1, t2) ->  Double.compare(t2.getSchedulingDeadline(), t1.getSchedulingDeadline())); // Sort steps according to their scheduling deadlines (fisrt step has larger SD)
+        for (int i = 0; i< steps.size(); i++){
+            stepsList.get(i).setPriority(i+1);
         }
     }
 
-    public List<Task> getInterferentTasks(Task aTask){
-        // Returns list of tasks with higher or equal priority than t in the processor (excluding t)
-        List<Task> interferent = new ArrayList<>();
-        for (Task t: tasks){
-            if ((t.getPriority() >= aTask.getPriority()) && (t != aTask)) {
+    public List<Step> getInterferentSteps(Step aStep){
+        // Returns list of steps with higher or equal priority than t in the processor (excluding t)
+        List<Step> interferent = new ArrayList<>();
+        for (Step t: steps){
+            if ((t.getPriority() >= aStep.getPriority()) && (t != aStep)) {
                 interferent.add(t);
             }
         }
@@ -166,13 +166,13 @@ public class Processor {
     }
 
     public void calculateApproxLocalResponseTimes(){
-        // Approximate response time analysis for independent tasks
-        for (Task t: tasks){
+        // Approximate response time analysis for independent steps
+        for (Step t: steps){
             Double sum = t.getWcet();
             Double periodAnalysis = t.getFlow().getPeriod();
 
-            List<Task> interferent = getInterferentTasks(t);
-            for (Task it: interferent){
+            List<Step> interferent = getInterferentSteps(t);
+            for (Step it: interferent){
                 Double periodCurrent = it.getFlow().getPeriod();
                 Double wcetCurrent = it.getWcet();
                 sum += ceil(periodAnalysis/periodCurrent)*wcetCurrent;
@@ -182,14 +182,14 @@ public class Processor {
     }
 
     public void calculateApproxDeadlinesLocalResponseTimes(){
-        // Approximate response time analysis for independent tasks, for D>T
-        for (Task t: tasks){
+        // Approximate response time analysis for independent steps, for D>T
+        for (Step t: steps){
             Double sum = t.getWcet();
             Double periodAnalysis = t.getFlow().getPeriod();
             Double deadlineAnalysis = t.getFlow().getDeadline();
 
-            List<Task> interferent = getInterferentTasks(t);
-            for (Task it: interferent){
+            List<Step> interferent = getInterferentSteps(t);
+            for (Step it: interferent){
                 Double periodCurrent = it.getFlow().getPeriod();
                 Double wcetCurrent = it.getWcet();
                 sum += ceil(deadlineAnalysis/periodCurrent)*wcetCurrent;
@@ -199,16 +199,16 @@ public class Processor {
     }
 
     public void calculateExactLocalResponseTime(){
-        // Exact response time analysis for independent tasks
+        // Exact response time analysis for independent steps
 
-        for (Task ta: tasks){ // Task under analysis
-            List<Task> interferent = getInterferentTasks(ta);
+        for (Step ta: steps){ // Step under analysis
+            List<Step> interferent = getInterferentSteps(ta);
 
             double wcant = ta.getWcet();
             double wc;
             while (true){
                 wc = ta.getWcet();
-                for (Task ti: interferent) {
+                for (Step ti: interferent) {
                     double periodCurrent = ti.getFlow().getPeriod();
                     double wcetCurrent = ti.getWcet();
                     wc += ceil(wcant/periodCurrent)*wcetCurrent;
