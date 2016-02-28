@@ -8,8 +8,9 @@ import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
 import es.istr.unican.jmastanalysis.system.Flow;
 import es.istr.unican.jmastanalysis.system.MastSystem;
 import es.istr.unican.jmastanalysis.system.Processor;
-import es.istr.unican.jmastanalysis.system.Step;
+import es.istr.unican.jmastanalysis.system.Task;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,8 +58,8 @@ public class Mario {
         for (int i=0; i<2; i++){
             Flow f = new Flow(i+1, (double)periods[i], (double)deadlines[i]);
             for (int j=0; j<3; j++){
-                Step t = new Step(wcet[i][j], 0.0, priorities[i][j], processors.get(localization[i][j]-1));
-                f.addStep(t);
+                Task t = new Task(wcet[i][j], 0.0, priorities[i][j], processors.get(localization[i][j]-1));
+                f.addTask(t);
             }
             flows.add(f);
         }
@@ -68,15 +69,15 @@ public class Mario {
         System.out.println("Resumen del sistema:");
         mySystem.printOverview();   // Periodo : (wcet, procesador, prioridad) () ... : plazo
                                     // ...
-                                    // Utilizacion Procesador 1 ... : Utilizaciï¿½n media en el sistema
+                                    // Utilizacion Procesador 1 ... : Utilización media en el sistema
 
-        // Configuraciï¿½n de la ejecuciï¿½n de MAST (analisis y/o asignaciï¿½n de prioridades)
+        // Configuración de la ejecución de MAST (analisis y/o asignación de prioridades)
         MastConfig config = new MastConfig();
         config.setAnalysis(AnalysisOptions.HOLISTIC);
         config.setAssignment(AssignmentOptions.HOSPA);
 
 
-        // Ejecuciï¿½n de MAST sobre el sistema generado
+        // Ejecución de MAST sobre el sistema generado
         // Aunque se ejecute HOSPA, no se actualizan las prioridades en el MastSystem
         try {
             MastTool.analyze(mySystem, config);
@@ -89,7 +90,7 @@ public class Mario {
         mySystem.printResultsOverview();    // Periodo : tiempo de respuesta ... : plazo -> Indice de planificabilidad
 
         // Tambien podemos obtener los tiempos de respuesta como un array bidimensional
-        System.out.printf("\nTiempos de respuesta (array):\n%s", Arrays.deepToString(mySystem.getStepsWCRTAsArray()));
+        System.out.printf("\nTiempos de respuesta (array):\n%s", Arrays.deepToString(mySystem.getTasksWCRTAsArray()));
 
     }
 

@@ -19,40 +19,40 @@ public class Flow {
 
     private Double period;
     private Double deadline;
-    private List<Step> steps;
+    private List<Task> tasks;
 
     public Flow() {
-        steps = new ArrayList<>();
+        tasks = new ArrayList<>();
     }
 
     public Flow(Integer id, Double period, Double deadline){
-        steps = new ArrayList<>();
+        tasks = new ArrayList<>();
         this.id = id;
         this.period = period;
         this.deadline = deadline;
     }
 
-    public void addStep(Step aStep) {
-        steps.add(aStep);
-        aStep.setFlow(this);
-        aStep.setId(String.format("%d%d", id, steps.indexOf(aStep) + 1));
+    public void addTask(Task aTask) {
+        tasks.add(aTask);
+        aTask.setFlow(this);
+        aTask.setId(String.format("%d%d", id, tasks.indexOf(aTask) + 1));
     }
 
-    public void locateSteps(List<Processor> procs, LocalizationOptions type, Random r) {
+    public void locateTasks(List<Processor> procs, LocalizationOptions type, Random r) {
 
         switch (type) {
             case RANDOM:
                 ArrayList<Integer> shuffledProcIndexes =
-                        new ArrayList<>(Utils.shuffleToList(procs.size(), steps.size(), r));
-                for (int i = 0; i < steps.size(); i++) {
-                    steps.get(i).setProcessor(procs.get(shuffledProcIndexes.get(i)));
+                        new ArrayList<>(Utils.shuffleToList(procs.size(), tasks.size(), r));
+                for (int i = 0; i < tasks.size(); i++) {
+                    tasks.get(i).setProcessor(procs.get(shuffledProcIndexes.get(i)));
                 }
 
                 break;
 
             case RANDOM_B:
                 // Completely random assignment, without common seed
-                for (Step t: steps){
+                for (Task t: tasks){
                     int randomProcIndex = Utils.getRandomInt(0, procs.size()-1);
                     t.setProcessor(procs.get(randomProcIndex));
                 }
@@ -61,7 +61,7 @@ public class Flow {
             case AVOID_CONSECUTIVE:
                 Processor lastProc = null;
                 Processor tempProc;
-                for (Step t : steps) {
+                for (Task t : tasks) {
                     while (true) {
                         tempProc = procs.get(r.nextInt(procs.size()));
                         if ((tempProc != lastProc) || (procs.size() == 1)) {
@@ -106,7 +106,7 @@ public class Flow {
     }
 
     public void setDeadline(DeadlineConfig c, Random r) {
-        int n = steps.size();
+        int n = tasks.size();
         switch (c.getValue()) {
 
             // Extremes of segment
@@ -160,7 +160,7 @@ public class Flow {
 
     public Double getSumWCET(){
         Double sum = 0.0;
-        for (Step t: steps){
+        for (Task t: tasks){
             sum += t.getWcet();
         }
         return sum;
@@ -172,14 +172,14 @@ public class Flow {
 
     public void setPDSchedulingDeadlines(){
         Double sumWCET = this.getSumWCET();
-        for (Step t: steps){
+        for (Task t: tasks){
             t.setSchedulingDeadline(this.getDeadline()*t.getWcet()/sumWCET);
         }
     }
 
     public void calculateWCRTfromW(){
         Double sum = 0.0;
-        for (Step t: steps){
+        for (Task t: tasks){
             sum += t.getW();
             t.setWcrt(sum);
         }
@@ -193,17 +193,17 @@ public class Flow {
         this.id = id;
     }
 
-    public List<Step> getSteps() {
-        return steps;
+    public List<Task> getTasks() {
+        return tasks;
     }
 
-    public void setSteps(List<Step> steps) {
-        this.steps = steps;
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 
     public void printOverview() {
         java.lang.System.out.format("%f : ", period);
-        for (Step t : steps) {
+        for (Task t : tasks) {
             t.printOverview();
             java.lang.System.out.printf(" ");
         }
@@ -212,16 +212,16 @@ public class Flow {
 
     public void printResultsOverview() {
         java.lang.System.out.format("%f : ", period);
-        for (Step t : steps) {
+        for (Task t : tasks) {
             java.lang.System.out.printf("%f", t.getWcrt());
             java.lang.System.out.printf(" ");
         }
         java.lang.System.out.printf(": %f -> SI=%f%%\n", deadline, calculateSchedIndex());
     }
 
-    public void setStepResults(String stepID, Double bcrt, Double wcrt, Double jitter) {
-        for (Step t : steps) {
-            if (t.getId().toLowerCase().equals(stepID.toLowerCase())) {
+    public void setTaskResults(String taskID, Double bcrt, Double wcrt, Double jitter) {
+        for (Task t : tasks) {
+            if (t.getId().toLowerCase().equals(taskID.toLowerCase())) {
                 t.setBcrt(bcrt);
                 t.setWcrt(wcrt);
                 t.setJitter(jitter);
@@ -230,17 +230,17 @@ public class Flow {
     }
 
     public Double getFlowWCRT() {
-        return this.steps.get(this.steps.size() - 1).getWcrt();
+        return this.tasks.get(this.tasks.size() - 1).getWcrt();
     }
 
     public void writeOperations(PrintWriter pw) {
-        for (Step mt : (List<Step>) getSteps()) {
+        for (Task mt : (List<Task>) getTasks()) {
             mt.writeOperation(pw);
         }
     }
 
     public void writeSchedulingServers(PrintWriter pw) {
-        for (Step mt : (List<Step>) getSteps()) {
+        for (Task mt : (List<Task>) getTasks()) {
             mt.writeSchedulingServer(pw);
         }
     }
@@ -257,7 +257,7 @@ public class Flow {
         pw.format("                    Phase       => 0)),\n\n");
 
         pw.format("      Internal_Events   => (\n");
-        Iterator<Step> iterator = ((List<Step>) getSteps()).iterator();
+        Iterator<Task> iterator = ((List<Task>) getTasks()).iterator();
         while (true) {
             pw.format("              (Type     => Regular,\n");
             pw.format("               Name     => IE_%s", iterator.next().getId());
@@ -273,10 +273,10 @@ public class Flow {
             }
         }
 
-        Iterator<Step> iterator2 = ((List<Step>) getSteps()).iterator(); //not possible to rewind iterator
+        Iterator<Task> iterator2 = ((List<Task>) getTasks()).iterator(); //not possible to rewind iterator
         String prevID = String.format("EE_%d", getId());
         pw.format("      Event_Handlers            => (\n");
-        Step mt = iterator2.next();
+        Task mt = iterator2.next();
         while (true) {
             pw.format("              (Type                => Activity,\n");
             pw.format("               Input_Event         => %s,\n", prevID);

@@ -114,8 +114,8 @@ public class MastSystem {
         return flows;
     }
 
-    public void setStepResults(int flowId, String stepID, Double bcrt, Double wcrt, Double jitter) {
-        flows.get(flowId - 1).setStepResults(stepID, bcrt, wcrt, jitter);
+    public void setTaskResults(int flowId, String taskID, Double bcrt, Double wcrt, Double jitter) {
+        flows.get(flowId - 1).setTaskResults(taskID, bcrt, wcrt, jitter);
     }
 
     public double getSystemAvgWCRT() {
@@ -126,16 +126,16 @@ public class MastSystem {
         return sum / this.flows.size();
     }
 
-    public double[][] getStepsWCRTAsArray() {
+    public double[][] getTasksWCRTAsArray() {
         int maxLength = 0;
         for (Flow f: flows){
-            maxLength = (f.getSteps().size() > maxLength) ? f.getSteps().size() : maxLength;
+            maxLength = (f.getTasks().size() > maxLength) ? f.getTasks().size() : maxLength;
         }
         double [][] wcrts = new double[flows.size()][maxLength];
 
         for (int i=0; i<flows.size(); i++){
-            for (int j = 0; j< flows.get(i).getSteps().size(); j++){
-                wcrts[i][j] = flows.get(i).getSteps().get(j).getWcrt();
+            for (int j=0; j< flows.get(i).getTasks().size(); j++){
+                wcrts[i][j] = flows.get(i).getTasks().get(j).getWcrt();
             }
         }
 
@@ -223,42 +223,40 @@ public class MastSystem {
                 processors.add(proc);
             }
 
-            // Add e2e flows and steps
+            // Add e2e flows and tasks
             Integer singleFlows = (int) (c.getSingleFlows() / 100.0 * c.getnFlows());
             for (int i = 1; i <= c.getnFlows(); i++) {
                 Flow flow = new Flow();
                 flow.setId(i);
 
-                // Add steps to e2e flow
-                Integer nSteps;
+                // Add tasks to e2e flow
+                Integer nTasks;
                 if (i <= singleFlows) {
-                    nSteps = 1;
+                    nTasks = 1;
                 } else if (c.getRandomLength()) {
-                    nSteps = random.nextInt((c.getnSteps()+1) - 2) + 2; // random integer between [2, number of steps]
+                    nTasks = random.nextInt((c.getnTasks()+1) - 2) + 2; // random integer between [2, number of tasks]
                 } else {
-                    nSteps = c.getnSteps();
+                    nTasks = c.getnTasks();
                 }
 
-                Processor lastProc = null; // for step processor localization
-                for (int j = 1; j <= nSteps; j++) {
-                    Step step = new Step();
-                    step.setPriority(1);
-                    step.setSchedulingDeadline(1.0);
-                    flow.addStep(step);
+                Processor lastProc = null; // for task processor localization
+                for (int j = 1; j <= nTasks; j++) {
+                    Task task = new Task();
+                    task.setPriority(1);
+                    task.setSchedulingDeadline(1.0);
+                    flow.addTask(task);
                 }
                 flows.add(flow);
             }
 
-            System.out.println(flows.size());
-
-            // Step localization, and flow periods and deadlines
+            // Task localization, and flow periods and deadlines
             for (Flow f : flows) {
-                f.locateSteps((List<Processor>) processors, c.getLocalization(), random);
+                f.locateTasks((List<Processor>) processors, c.getLocalization(), random);
                 f.setPeriod(c.getPeriod(), random);
                 f.setDeadline(c.getDeadline(), random);
             }
 
-            // Generate Load (step wcet)
+            // Generate Load (task wcet)
             switch (c.getUtilization().getBalancing()) {
 
                 case BALANCED: //every processor with the same utilization
@@ -291,7 +289,7 @@ public class MastSystem {
                     break;
             }
 
-            // Set BCET of steps
+            // Set BCET of tasks
             for (Processor p : processors) {
                 p.setBestCaseUtilization(c.getUtilization().getBcetFactor());
             }
@@ -326,7 +324,7 @@ public class MastSystem {
             }
             pw.write("\n");
 
-            // Scheduling Servers (Steps)
+            // Scheduling Servers (Tasks)
             for (Flow mf : (List<Flow>) getFlows()) {
                 mf.writeSchedulingServers(pw);
             }

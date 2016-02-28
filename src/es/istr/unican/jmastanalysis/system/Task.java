@@ -6,7 +6,7 @@ import java.util.Locale;
 /**
  * Created by juanm on 02/11/2015.
  */
-public class Step {
+public class Task {
 
     private String id;
 
@@ -25,14 +25,14 @@ public class Step {
     private Double jitter;
     private Double w; //similar to local response time, wcrt is calculated as the sum of the previous w's
 
-    public Step(Double wcet, Double bcet, Integer priority, Processor proc){
+    public Task(Double wcet, Double bcet, Integer priority, Processor proc){
         this.wcet = wcet;
         this.bcet = bcet;
         this.priority = priority;
         setProcessor(proc);
     }
 
-    public Step(){
+    public Task(){
         super();
     }
 
@@ -92,7 +92,7 @@ public class Step {
 
     public void setProcessor(Processor processor) {
         this.processor = processor;
-        processor.addStep(this);
+        processor.addTask(this);
     }
 
     public Double getWcrt() {

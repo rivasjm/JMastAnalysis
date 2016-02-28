@@ -154,7 +154,7 @@ public class MastTool {
             REALTIMESITUATION element = (REALTIMESITUATION) jaxbUnmarshaller.unmarshal(results);
 
             Integer flowID;
-            String stepID;
+            String taskID;
             Double bcrt;
             Double wcrt;
             Double jitter;
@@ -169,11 +169,11 @@ public class MastTool {
                         if (to instanceof TimingResult) {
                             TimingResult timing = (TimingResult) to;
 
-                            stepID = String.format("%s", timing.getEventName().replaceAll("\\D+", ""));
+                            taskID = String.format("%s", timing.getEventName().replaceAll("\\D+", ""));
                             bcrt = timing.getBestGlobalResponseTimes().getGlobalResponseTime().get(0).getTimeValue();
                             wcrt = timing.getWorstGlobalResponseTimes().getGlobalResponseTime().get(0).getTimeValue();
                             jitter = timing.getJitters().getGlobalResponseTime().get(0).getTimeValue();
-                            system.setStepResults(flowID, stepID, bcrt, wcrt, jitter);
+                            system.setTaskResults(flowID, taskID, bcrt, wcrt, jitter);
 
                         }
                     }

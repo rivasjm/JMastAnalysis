@@ -17,7 +17,7 @@ public class SystemConfig {
     private Integer seed;
     private Integer nProcs;
     private Integer nFlows;
-    private Integer nSteps;
+    private Integer nTasks;
     private Boolean randomLength;
     private Float singleFlows;
     private String schedPolicy;
@@ -45,8 +45,8 @@ public class SystemConfig {
                 case "N_FLOWS":
                     this.setnFlows(Integer.parseInt(value));
                     break;
-                case "N_STEPS":
-                    this.setnSteps(Integer.parseInt(value));
+                case "N_TASKS":
+                    this.setnTasks(Integer.parseInt(value));
                     break;
                 case "RANDOM_LENGTH":
                     this.setRandomLength(Boolean.parseBoolean(value));
@@ -100,11 +100,11 @@ public class SystemConfig {
 
     }
 
-    public SystemConfig(Integer theSeed, Integer nProcs, Integer nFlows, Integer nSteps, Boolean randomLength, Float singleFlows, String schedPolicy, PeriodConfig period, DeadlineConfig deadline, LocalizationOptions localization, UtilizationConfig utilization) {
+    public SystemConfig(Integer theSeed, Integer nProcs, Integer nFlows, Integer nTasks, Boolean randomLength, Float singleFlows, String schedPolicy, PeriodConfig period, DeadlineConfig deadline, LocalizationOptions localization, UtilizationConfig utilization) {
         this.seed = theSeed;
         this.nProcs = nProcs;
         this.nFlows = nFlows;
-        this.nSteps = nSteps;
+        this.nTasks = nTasks;
         this.randomLength = randomLength;
         this.singleFlows = singleFlows;
         this.schedPolicy = schedPolicy;
@@ -124,7 +124,7 @@ public class SystemConfig {
 //        map.put(LinearSystemConfigurableOptions.SEED, seed.toString());
 //        map.put(LinearSystemConfigurableOptions.N_PROCESSORS, nProcs.toString());
 //        map.put(LinearSystemConfigurableOptions.N_FLOWS, nFlows.toString());
-//        map.put(LinearSystemConfigurableOptions.N_STEPS, nSteps.toString());
+//        map.put(LinearSystemConfigurableOptions.N_TASKS, nTasks.toString());
 //        map.put(LinearSystemConfigurableOptions.RANDOM_LENGTH, randomLength.toString());
 //
 //
@@ -155,12 +155,12 @@ public class SystemConfig {
         this.nFlows = nFlows;
     }
 
-    public Integer getnSteps() {
-        return nSteps;
+    public Integer getnTasks() {
+        return nTasks;
     }
 
-    public void setnSteps(Integer nSteps) {
-        this.nSteps = nSteps;
+    public void setnTasks(Integer nTasks) {
+        this.nTasks = nTasks;
     }
 
     public Float getSingleFlows() {
