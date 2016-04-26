@@ -89,6 +89,7 @@ public class MastTool {
             //Execute MAST Tool
             long beforeTime = System.nanoTime();
             launchCommand(cmd, 10000L, null);
+            System.out.println(cmd);
             long afterTime = System.nanoTime();
 
             //Integrate results
@@ -98,9 +99,9 @@ public class MastTool {
             throw e;
         } finally {
             // Detele files
-            new File(inputFilePath).delete();
-            new File(outputFilePath).delete();
-            new File("mast_parser.lis").delete();
+            //new File(inputFilePath).delete();
+            //new File(outputFilePath).delete();
+            //new File("mast_parser.lis").delete();
         }
     }
 

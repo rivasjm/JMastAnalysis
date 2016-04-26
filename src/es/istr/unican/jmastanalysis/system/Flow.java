@@ -35,7 +35,7 @@ public class Flow {
     public void addStep(Step aStep) {
         steps.add(aStep);
         aStep.setFlow(this);
-        aStep.setId(String.format("%d%d", id, steps.indexOf(aStep) + 1));
+        aStep.setId(String.format("%d_%d", id, steps.indexOf(aStep) + 1));
     }
 
     public void locateSteps(List<Processor> procs, LocalizationOptions type, Random r) {
@@ -45,7 +45,7 @@ public class Flow {
                 ArrayList<Integer> shuffledProcIndexes =
                         new ArrayList<>(Utils.shuffleToList(procs.size(), steps.size(), r));
                 for (int i = 0; i < steps.size(); i++) {
-                    steps.get(i).setProcessor(procs.get(shuffledProcIndexes.get(i)));
+                    steps.get(i).getTask().setProcessor(procs.get(shuffledProcIndexes.get(i)));
                 }
 
                 break;
@@ -54,7 +54,7 @@ public class Flow {
                 // Completely random assignment, without common seed
                 for (Step t: steps){
                     int randomProcIndex = Utils.getRandomInt(0, procs.size()-1);
-                    t.setProcessor(procs.get(randomProcIndex));
+                    t.getTask().setProcessor(procs.get(randomProcIndex));
                 }
                 break;
 
@@ -65,7 +65,7 @@ public class Flow {
                     while (true) {
                         tempProc = procs.get(r.nextInt(procs.size()));
                         if ((tempProc != lastProc) || (procs.size() == 1)) {
-                            t.setProcessor(tempProc);
+                            t.getTask().setProcessor(tempProc);
                             lastProc = tempProc;
                             break;
                         }
@@ -173,7 +173,7 @@ public class Flow {
     public void setPDSchedulingDeadlines(){
         Double sumWCET = this.getSumWCET();
         for (Step t: steps){
-            t.setSchedulingDeadline(this.getDeadline()*t.getWcet()/sumWCET);
+            t.getTask().setSchedulingDeadline(this.getDeadline()*t.getWcet()/sumWCET);
         }
     }
 
@@ -239,11 +239,6 @@ public class Flow {
         }
     }
 
-    public void writeSchedulingServers(PrintWriter pw) {
-        for (Step mt : (List<Step>) getSteps()) {
-            mt.writeSchedulingServer(pw);
-        }
-    }
 
     public void writeTransaction(PrintWriter pw) {
         pw.format("Transaction (\n");
@@ -283,7 +278,7 @@ public class Flow {
             prevID = String.format("IE_%s", mt.getId());
             pw.format("               Output_Event        => IE_%s,\n", mt.getId());
             pw.format("               Activity_Operation  => O_%s,\n", mt.getId());
-            pw.format("               Activity_Server     => SS_%s)", mt.getId());
+            pw.format("               Activity_Server     => SS_%s)", mt.getTask().getId());
             if (iterator2.hasNext()) {
                 pw.format(",\n");
                 mt = iterator2.next();

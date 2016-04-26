@@ -20,6 +20,7 @@ public class MastSystem {
     private String name;
     private List<Flow> flows;
     private List<Processor> processors;
+    private List<Task> tasks;
 
     private Random random;
 
@@ -34,12 +35,14 @@ public class MastSystem {
     public MastSystem() {
         flows = new ArrayList<>();
         processors = new ArrayList<>();
+        tasks = new ArrayList<>();
         random = new Random();
     }
 
-    public MastSystem(List<Flow> flowList, List<Processor> procList){
+    public MastSystem(List<Flow> flowList, List<Processor> procList, List<Task> taskList){
         flows = flowList;
         processors = procList;
+        tasks = taskList;
         random = new Random();
     }
 
@@ -217,8 +220,7 @@ public class MastSystem {
 
             // Add processors
             for (int i = 1; i <= c.getnProcs(); i++) {
-                Processor proc = new Processor();
-                proc.setId(i);
+                Processor proc = new Processor(i);
                 proc.setSchedulingPolicy(c.getSchedPolicy());
                 processors.add(proc);
             }
@@ -242,8 +244,8 @@ public class MastSystem {
                 Processor lastProc = null; // for step processor localization
                 for (int j = 1; j <= nSteps; j++) {
                     Step step = new Step();
-                    step.setPriority(1);
-                    step.setSchedulingDeadline(1.0);
+                    step.getTask().setPriority(1);
+                    step.getTask().setSchedulingDeadline(1.0);
                     flow.addStep(step);
                 }
                 flows.add(flow);
@@ -307,33 +309,37 @@ public class MastSystem {
             PrintWriter pw = new PrintWriter(o);
 
             // Processing Resources
-            for (Processor p : (List<Processor>) getProcessors()) {
+            for (Processor p : getProcessors()) {
                 p.writeProcessingResource(pw);
                 pw.write("\n");
             }
             pw.write("\n");
 
+
             // Schedulers
-            for (Processor p : (List<Processor>) getProcessors()) {
+            for (Processor p : getProcessors()) {
                 p.writeScheduler(pw);
                 pw.write("\n");
             }
             pw.write("\n");
 
+
             // Operations
-            for (Flow mf : (List<Flow>) getFlows()) {
+            for (Flow mf : getFlows()) {
                 mf.writeOperations(pw);
             }
             pw.write("\n");
 
-            // Scheduling Servers (Steps)
-            for (Flow mf : (List<Flow>) getFlows()) {
-                mf.writeSchedulingServers(pw);
+
+            // Scheduling Servers
+            for (Task task : tasks) {
+                task.writeSchedulingServer(pw);
             }
             pw.write("\n");
 
+
             // Transactions
-            for (Flow mf : (List<Flow>) getFlows()) {
+            for (Flow mf :  getFlows()) {
                 mf.writeTransaction(pw);
             }
 

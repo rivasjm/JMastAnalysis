@@ -14,9 +14,7 @@ public class Step {
     private Double wcet;
     private Double bcet;
     private Double offset;
-    private Integer priority;
-    private Double schedulingDeadline;
-    private Processor processor;
+    private Task task;
     private Flow flow;
 
     // Results
@@ -25,11 +23,11 @@ public class Step {
     private Double jitter;
     private Double w; //similar to local response time, wcrt is calculated as the sum of the previous w's
 
-    public Step(Double wcet, Double bcet, Integer priority, Processor proc){
+    public Step(Double wcet, Double bcet, Task task){
         this.wcet = wcet;
         this.bcet = bcet;
-        this.priority = priority;
-        setProcessor(proc);
+        this.task = task;
+        setTask(task);
     }
 
     public Step(){
@@ -37,6 +35,11 @@ public class Step {
     }
 
     // Getters and Setters
+
+
+    public Task getTask() {
+        return task;
+    }
 
     public Double getWcet() {
         return wcet;
@@ -71,28 +74,20 @@ public class Step {
     }
 
     public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
+        return task.getPriority();
     }
 
     public Double getSchedulingDeadline() {
-        return schedulingDeadline;
-    }
-
-    public void setSchedulingDeadline(Double schedulingDeadline) {
-        this.schedulingDeadline = schedulingDeadline;
+        return task.getSchedulingDeadline();
     }
 
     public Processor getProcessor() {
-        return processor;
+        return task.getProcessor();
     }
 
-    public void setProcessor(Processor processor) {
-        this.processor = processor;
-        processor.addStep(this);
+    public void setTask(Task task) {
+        this.task = task;
+        task.addStep(this);
     }
 
     public Double getWcrt() {
@@ -136,7 +131,7 @@ public class Step {
     }
 
     public void printOverview() {
-        java.lang.System.out.format("(%f, %d, %d)", wcet, processor.getId(), priority);
+        java.lang.System.out.format("(%f, %d, %d)", wcet, task.getProcessor().getId(), task.getPriority());
     }
 
     private void printResult(){
@@ -153,26 +148,6 @@ public class Step {
 
     }
 
-    public void writeSchedulingServer(PrintWriter pw) {
 
-        pw.format("Scheduling_Server (\n");
-        pw.format("        Type                       => Regular,\n");
-        pw.format("        Name    => SS_%s,\n", getId());
-        pw.format("        Server_Sched_Parameters         => (\n");
-
-        if (getProcessor().getSchedulingPolicy().equals("FP")) {
-            pw.format("                Type                    => Fixed_Priority_policy,\n");
-            pw.format("                The_Priority            => %d,\n", getPriority());
-        } else if (getProcessor().getSchedulingPolicy().equals("EDF")) {
-            pw.format("                Type                    => EDF_policy,\n");
-            pw.format("                Deadline                => %f,\n", getSchedulingDeadline());
-        } else {
-            throw new IllegalArgumentException("Scheduling policy " + getProcessor().getSchedulingPolicy() + " not valid");
-        }
-
-        pw.format("                Preassigned             => No),\n");
-        pw.format("        Scheduler      => s%d);\n\n", getProcessor().getId());
-
-    }
 
 }
