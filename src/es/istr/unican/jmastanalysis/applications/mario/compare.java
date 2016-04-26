@@ -6,7 +6,7 @@ import es.istr.unican.jmastanalysis.analysis.config.AssignmentOptions;
 import es.istr.unican.jmastanalysis.analysis.config.HOSPAConfig;
 import es.istr.unican.jmastanalysis.analysis.config.MastConfig;
 import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
-import es.istr.unican.jmastanalysis.system.MastSystem;
+import es.istr.unican.jmastanalysis.system.MSystem;
 import es.istr.unican.jmastanalysis.system.config.SystemConfig;
 import es.istr.unican.jmastanalysis.system.config.deadline.DeadlineConfig;
 import es.istr.unican.jmastanalysis.system.config.load.LoadBalancingOptions;
@@ -16,12 +16,6 @@ import es.istr.unican.jmastanalysis.system.config.localization.LocalizationOptio
 import es.istr.unican.jmastanalysis.system.config.period.PeriodConfig;
 import es.istr.unican.jmastanalysis.system.config.period.PeriodDistributionOptions;
 import es.istr.unican.jmastanalysis.utils.Utils;
-
-import javax.rmi.CORBA.Util;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
 
 /**
  * Created by juanm on 03/11/2015.
@@ -79,8 +73,8 @@ public class compare {
         int agreeExact = 0;
         int agreeApprox = 0;
 
-        MastSystem sysA = null;
-        MastSystem sysB = null;
+        MSystem sysA = null;
+        MSystem sysB = null;
         for (int seed=1; seed<=100; seed++){
 
             s.setSeed(seed);
@@ -96,7 +90,7 @@ public class compare {
 
             try {
                 // System A
-                sysA = new MastSystem(s);
+                sysA = new MSystem(s);
                 //System.out.println("System A");
                 //sysA.printOverview();
                 sysA.setPDPriorities();
@@ -106,20 +100,20 @@ public class compare {
                 Double siOptA = sysA.getSystemSchedIndex();
                 System.out.printf("%2.2f hol=", siOptA);
 
-                sysA = new MastSystem(s);
+                sysA = new MSystem(s);
                 sysA.setPDPriorities();
                 m.setAnalysis(AnalysisOptions.HOLISTIC);
                 MastTool.analyze(sysA, m);
                 Double siHolA = sysA.getSystemSchedIndex();
                 System.out.printf("%2.2f exact=", siHolA);
 
-                sysA = new MastSystem(s);
+                sysA = new MSystem(s);
                 sysA.setPDPriorities();
                 sysA.calculateExactLocalResponseTime();
                 Double siExactA = sysA.getSystemSchedIndex();
                 System.out.printf("%2.2f approx=", siExactA);
 
-                sysA = new MastSystem(s);
+                sysA = new MSystem(s);
                 sysA.setPDPriorities();
                 sysA.calculateApproxLocalResponseTimes();
                 Double siApproxA = sysA.getSystemSchedIndex();
@@ -128,7 +122,7 @@ public class compare {
 
                 // System B
 
-                sysB = new MastSystem(s);
+                sysB = new MSystem(s);
                 //System.out.println("System B");
                 //sysB.printOverview();
                 sysB.setPDPriorities();
@@ -138,20 +132,20 @@ public class compare {
                 Double siOptB = sysB.getSystemSchedIndex();
                 System.out.printf("%2.2f hol=", siOptB);
 
-                sysB = new MastSystem(s);
+                sysB = new MSystem(s);
                 sysB.setPDPriorities();
                 m.setAnalysis(AnalysisOptions.HOLISTIC);
                 MastTool.analyze(sysB, m);
                 Double siHolB = sysB.getSystemSchedIndex();
                 System.out.printf("%2.2f exact=", siHolB);
 
-                sysB = new MastSystem(s);
+                sysB = new MSystem(s);
                 sysB.setPDPriorities();
                 sysB.calculateExactLocalResponseTime();
                 Double siExactB = sysB.getSystemSchedIndex();
                 System.out.printf("%2.2f approx=", siExactB);
 
-                sysB = new MastSystem(s);
+                sysB = new MSystem(s);
                 sysB.setPDPriorities();
                 sysB.calculateApproxLocalResponseTimes();
                 Double siApproxB = sysB.getSystemSchedIndex();

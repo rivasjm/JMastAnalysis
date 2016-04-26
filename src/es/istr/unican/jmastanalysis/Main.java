@@ -6,7 +6,7 @@ import es.istr.unican.jmastanalysis.analysis.config.AssignmentOptions;
 import es.istr.unican.jmastanalysis.analysis.config.HOSPAConfig;
 import es.istr.unican.jmastanalysis.analysis.config.MastConfig;
 import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
-import es.istr.unican.jmastanalysis.system.MastSystem;
+import es.istr.unican.jmastanalysis.system.MSystem;
 import es.istr.unican.jmastanalysis.system.config.SystemConfig;
 import es.istr.unican.jmastanalysis.system.config.deadline.DeadlineConfig;
 import es.istr.unican.jmastanalysis.system.config.load.LoadBalancingOptions;
@@ -15,8 +15,6 @@ import es.istr.unican.jmastanalysis.system.config.load.WCETGenerationOptions;
 import es.istr.unican.jmastanalysis.system.config.localization.LocalizationOptions;
 import es.istr.unican.jmastanalysis.system.config.period.PeriodConfig;
 import es.istr.unican.jmastanalysis.system.config.period.PeriodDistributionOptions;
-
-import java.io.File;
 
 public class Main {
 
@@ -67,7 +65,7 @@ public class Main {
         m.setJitterAvoidance(false);
 
         // Generate System
-        MastSystem sys = new MastSystem(s);
+        MSystem sys = new MSystem(s);
 
         sys.setPDPriorities();
         System.out.println("System Overview");

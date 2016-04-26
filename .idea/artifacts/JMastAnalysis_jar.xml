@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JMastAnalysis:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/JMastAnalysis_jar</output-path>
+    <root id="archive" name="JMastAnalysis.jar">
+      <element id="module-output" name="JMastAnalysis" />
+    </root>
+  </artifact>
+</component>

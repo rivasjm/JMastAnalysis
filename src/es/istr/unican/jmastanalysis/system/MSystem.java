@@ -15,12 +15,12 @@ import java.util.Random;
 /**
  * Created by juanm on 02/11/2015.
  */
-public class MastSystem {
+public class MSystem {
 
     private String name;
-    private List<Flow> flows;
-    private List<Processor> processors;
-    private List<Task> tasks;
+    private List<MFlow> flows;
+    private List<MProcessor> processors;
+    private List<MTask> tasks;
 
     private Random random;
 
@@ -32,32 +32,32 @@ public class MastSystem {
 
     // Public methods
 
-    public MastSystem() {
+    public MSystem() {
         flows = new ArrayList<>();
         processors = new ArrayList<>();
         tasks = new ArrayList<>();
         random = new Random();
     }
 
-    public MastSystem(List<Flow> flowList, List<Processor> procList, List<Task> taskList){
+    public MSystem(List<MFlow> flowList, List<MProcessor> procList, List<MTask> taskList){
         flows = flowList;
         processors = procList;
         tasks = taskList;
         random = new Random();
     }
 
-    public MastSystem(SystemConfig systemConfiguration) {
+    public MSystem(SystemConfig systemConfiguration) {
         flows = new ArrayList<>();
         processors = new ArrayList<>();
         random = new Random(systemConfiguration.getSeed());
         create(systemConfiguration);
     }
 
-    public void addFlow(Flow newFlow){
+    public void addFlow(MFlow newFlow){
         flows.add(newFlow);
     }
 
-    public void addProcessor(Processor newProcessor){
+    public void addProcessor(MProcessor newProcessor){
         processors.add(newProcessor);
     }
 
@@ -87,16 +87,16 @@ public class MastSystem {
 
     public Double getSystemUtilization() {
         Double u = 0.0;
-        for (Processor p : processors) u += p.getUtilization();
+        for (MProcessor p : processors) u += p.getUtilization();
         return u / processors.size();
     }
 
     public void printOverview() {
-        for (Flow f : flows) {
+        for (MFlow f : flows) {
             f.printOverview();
         }
         //System.out.printf("\n");
-        for (Processor p : processors) {
+        for (MProcessor p : processors) {
             p.printOverview();
             java.lang.System.out.printf(" ");
         }
@@ -104,16 +104,16 @@ public class MastSystem {
     }
 
     public void printResultsOverview() {
-        for (Flow f : flows) {
+        for (MFlow f : flows) {
             f.printResultsOverview();
         }
     }
 
-    public List<Processor> getProcessors() {
+    public List<MProcessor> getProcessors() {
         return processors;
     }
 
-    public List<Flow> getFlows() {
+    public List<MFlow> getFlows() {
         return flows;
     }
 
@@ -123,7 +123,7 @@ public class MastSystem {
 
     public double getSystemAvgWCRT() {
         Double sum = 0.0;
-        for (Flow f : this.flows) {
+        for (MFlow f : this.flows) {
             sum += f.getFlowWCRT();
         }
         return sum / this.flows.size();
@@ -131,7 +131,7 @@ public class MastSystem {
 
     public double[][] getStepsWCRTAsArray() {
         int maxLength = 0;
-        for (Flow f: flows){
+        for (MFlow f: flows){
             maxLength = (f.getSteps().size() > maxLength) ? f.getSteps().size() : maxLength;
         }
         double [][] wcrts = new double[flows.size()][maxLength];
@@ -148,14 +148,14 @@ public class MastSystem {
 
     public double getSystemSchedIndex(){
         List<Double> indices = new ArrayList<>();
-        for (Flow f: flows){
+        for (MFlow f: flows){
             indices.add(f.calculateSchedIndex());
         }
         return Collections.min(indices);
     }
 
     public boolean isSchedulable() {
-        for (Flow f : this.flows) {
+        for (MFlow f : this.flows) {
             if (f.getFlowWCRT() > f.getDeadline()) {
                 return false;
             }
@@ -164,49 +164,49 @@ public class MastSystem {
     }
 
     public void setPDSchedulingDeadlines(){
-        for (Flow f: flows){
+        for (MFlow f: flows){
             f.setPDSchedulingDeadlines();
         }
     }
 
     public void setPDPriorities(){
-        for (Flow f: flows){
+        for (MFlow f: flows){
             f.setPDSchedulingDeadlines();
         }
-        for (Processor p: processors){
+        for (MProcessor p: processors){
             p.setDeadlineMonotonicPriorities();
         }
     }
 
     public void setDeadlineMonotonicPriorities(){
-        for (Processor p: processors){
+        for (MProcessor p: processors){
             p.setDeadlineMonotonicPriorities();
         }
     }
 
     public void calculateApproxLocalResponseTimes(){
-        for (Processor p: processors){
+        for (MProcessor p: processors){
             p.calculateApproxLocalResponseTimes();
         }
-        for (Flow f: flows){
+        for (MFlow f: flows){
             f.calculateWCRTfromW();
         }
     }
 
     public void calculateApproxDeadlinesLocalResponseTimes(){
-        for (Processor p: processors){
+        for (MProcessor p: processors){
             p.calculateApproxDeadlinesLocalResponseTimes();
         }
-        for (Flow f: flows){
+        for (MFlow f: flows){
             f.calculateWCRTfromW();
         }
     }
 
     public void calculateExactLocalResponseTime(){
-        for (Processor p: processors){
+        for (MProcessor p: processors){
             p.calculateExactLocalResponseTime();
         }
-        for (Flow f: flows){
+        for (MFlow f: flows){
             f.calculateWCRTfromW();
         }
     }
@@ -220,7 +220,7 @@ public class MastSystem {
 
             // Add processors
             for (int i = 1; i <= c.getnProcs(); i++) {
-                Processor proc = new Processor(i);
+                MProcessor proc = new MProcessor(i);
                 proc.setSchedulingPolicy(c.getSchedPolicy());
                 processors.add(proc);
             }
@@ -228,7 +228,7 @@ public class MastSystem {
             // Add e2e flows and steps
             Integer singleFlows = (int) (c.getSingleFlows() / 100.0 * c.getnFlows());
             for (int i = 1; i <= c.getnFlows(); i++) {
-                Flow flow = new Flow();
+                MFlow flow = new MFlow();
                 flow.setId(i);
 
                 // Add steps to e2e flow
@@ -241,9 +241,9 @@ public class MastSystem {
                     nSteps = c.getnSteps();
                 }
 
-                Processor lastProc = null; // for step processor localization
+                MProcessor lastProc = null; // for step processor localization
                 for (int j = 1; j <= nSteps; j++) {
-                    Step step = new Step();
+                    MStep step = new MStep();
                     step.getTask().setPriority(1);
                     step.getTask().setSchedulingDeadline(1.0);
                     flow.addStep(step);
@@ -254,8 +254,8 @@ public class MastSystem {
             System.out.println(flows.size());
 
             // Step localization, and flow periods and deadlines
-            for (Flow f : flows) {
-                f.locateSteps((List<Processor>) processors, c.getLocalization(), random);
+            for (MFlow f : flows) {
+                f.locateSteps((List<MProcessor>) processors, c.getLocalization(), random);
                 f.setPeriod(c.getPeriod(), random);
                 f.setDeadline(c.getDeadline(), random);
             }
@@ -264,7 +264,7 @@ public class MastSystem {
             switch (c.getUtilization().getBalancing()) {
 
                 case BALANCED: //every processor with the same utilization
-                    for (Processor p : processors) {
+                    for (MProcessor p : processors) {
                         p.setUtilization(c.getUtilization().getWcetMethod(), 0.01, random);
                         p.scaleUtilization((c.getUtilization().getCurrentU() / 100.0) / 0.01);
                     }
@@ -273,7 +273,7 @@ public class MastSystem {
                 case NON_BALANCED: //each processor has a different utilization
                     // First create the utilization of each processor, so the system have 1% utilization
                     ArrayList<Double> us = new ArrayList<Double>();
-                    for (Processor p : processors) {
+                    for (MProcessor p : processors) {
                         us.add(random.nextDouble() + 0.5);
                     }
                     Double sum = 0.0;
@@ -294,7 +294,7 @@ public class MastSystem {
             }
 
             // Set BCET of steps
-            for (Processor p : processors) {
+            for (MProcessor p : processors) {
                 p.setBestCaseUtilization(c.getUtilization().getBcetFactor());
             }
 
@@ -309,7 +309,7 @@ public class MastSystem {
             PrintWriter pw = new PrintWriter(o);
 
             // Processing Resources
-            for (Processor p : getProcessors()) {
+            for (MProcessor p : getProcessors()) {
                 p.writeProcessingResource(pw);
                 pw.write("\n");
             }
@@ -317,7 +317,7 @@ public class MastSystem {
 
 
             // Schedulers
-            for (Processor p : getProcessors()) {
+            for (MProcessor p : getProcessors()) {
                 p.writeScheduler(pw);
                 pw.write("\n");
             }
@@ -325,21 +325,21 @@ public class MastSystem {
 
 
             // Operations
-            for (Flow mf : getFlows()) {
+            for (MFlow mf : getFlows()) {
                 mf.writeOperations(pw);
             }
             pw.write("\n");
 
 
             // Scheduling Servers
-            for (Task task : tasks) {
+            for (MTask task : tasks) {
                 task.writeSchedulingServer(pw);
             }
             pw.write("\n");
 
 
             // Transactions
-            for (Flow mf :  getFlows()) {
+            for (MFlow mf :  getFlows()) {
                 mf.writeTransaction(pw);
             }
 

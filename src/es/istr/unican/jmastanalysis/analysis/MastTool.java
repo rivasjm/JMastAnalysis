@@ -7,7 +7,7 @@ import es.istr.unican.jmastanalysis.analysis.results.REALTIMESITUATION;
 import es.istr.unican.jmastanalysis.analysis.results.TimingResult;
 import es.istr.unican.jmastanalysis.analysis.results.TransactionResults;
 import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
-import es.istr.unican.jmastanalysis.system.MastSystem;
+import es.istr.unican.jmastanalysis.system.MSystem;
 import org.apache.commons.exec.*;
 import org.apache.commons.io.FilenameUtils;
 
@@ -23,7 +23,7 @@ import java.util.Locale;
  */
 public class MastTool {
 
-    public static void analyze(MastSystem system, MastConfig config) throws InterruptedAnalysis{
+    public static void analyze(MSystem system, MastConfig config) throws InterruptedAnalysis{
 
 
         // Checks if mast_analysis.exe exists, and is executable
@@ -146,7 +146,7 @@ public class MastTool {
         }
     }
 
-    private static void integrateMASTResults(File results, MastSystem system) {
+    private static void integrateMASTResults(File results, MSystem system) {
 
         JAXBContext jaxbContext = null;
         try {

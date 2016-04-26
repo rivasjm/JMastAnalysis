@@ -7,12 +7,12 @@ import java.util.Set;
 /**
  * Created by Administrador on 26/04/2016.
  */
-public class Task {
+public class MTask {
 
     private Integer id;
 
-    private Processor processor;
-    private Set<Step> steps;
+    private MProcessor processor;
+    private Set<MStep> steps;
 
     // Scheduling parameters
     private Integer priority;
@@ -21,12 +21,12 @@ public class Task {
 
     // Constructor
 
-    public Task(Integer id) {
+    public MTask(Integer id) {
         this.id = id;
         steps = new HashSet<>();
     }
 
-    public Task(Integer id, Processor processor) {
+    public MTask(Integer id, MProcessor processor) {
         this.id = id;
         this.processor = processor;
         steps = new HashSet<>();
@@ -42,19 +42,19 @@ public class Task {
         this.id = id;
     }
 
-    public Processor getProcessor() {
+    public MProcessor getProcessor() {
         return processor;
     }
 
-    public void setProcessor(Processor processor) {
+    public void setProcessor(MProcessor processor) {
         this.processor = processor;
     }
 
-    public void addStep(Step step) {
+    public void addStep(MStep step) {
         steps.add(step);
     }
 
-    public Set<Step> getSteps(){
+    public Set<MStep> getSteps(){
         return steps;
     }
 

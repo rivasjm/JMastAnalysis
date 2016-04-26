@@ -6,7 +6,7 @@ import java.util.Locale;
 /**
  * Created by juanm on 02/11/2015.
  */
-public class Step {
+public class MStep {
 
     private String id;
 
@@ -14,8 +14,8 @@ public class Step {
     private Double wcet;
     private Double bcet;
     private Double offset;
-    private Task task;
-    private Flow flow;
+    private MTask task;
+    private MFlow flow;
     private Integer overrridenPriority;
 
     // Results
@@ -24,7 +24,7 @@ public class Step {
     private Double jitter;
     private Double w; //similar to local response time, wcrt is calculated as the sum of the previous w's
 
-    public Step(Double wcet, Double bcet, Task task){
+    public MStep(Double wcet, Double bcet, MTask task){
         this.wcet = wcet;
         this.bcet = bcet;
         this.task = task;
@@ -32,7 +32,7 @@ public class Step {
         setTask(task);
     }
 
-    public Step(Double wcet, Double bcet, Task task, Integer overridenPriority){
+    public MStep(Double wcet, Double bcet, MTask task, Integer overridenPriority){
         this.wcet = wcet;
         this.bcet = bcet;
         this.task = task;
@@ -40,14 +40,14 @@ public class Step {
         setTask(task);
     }
 
-    public Step(){
+    public MStep(){
         super();
     }
 
     // Getters and Setters
 
 
-    public Task getTask() {
+    public MTask getTask() {
         return task;
     }
 
@@ -91,11 +91,11 @@ public class Step {
         return task.getSchedulingDeadline();
     }
 
-    public Processor getProcessor() {
+    public MProcessor getProcessor() {
         return task.getProcessor();
     }
 
-    public void setTask(Task task) {
+    public void setTask(MTask task) {
         this.task = task;
         task.addStep(this);
     }
@@ -124,11 +124,11 @@ public class Step {
         this.jitter = jitter;
     }
 
-    public Flow getFlow() {
+    public MFlow getFlow() {
         return flow;
     }
 
-    public void setFlow(Flow flow) {
+    public void setFlow(MFlow flow) {
         this.flow = flow;
     }
 

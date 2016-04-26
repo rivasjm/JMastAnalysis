@@ -6,7 +6,7 @@ import es.istr.unican.jmastanalysis.analysis.config.AssignmentOptions;
 import es.istr.unican.jmastanalysis.analysis.config.HOSPAConfig;
 import es.istr.unican.jmastanalysis.analysis.config.MastConfig;
 import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
-import es.istr.unican.jmastanalysis.system.MastSystem;
+import es.istr.unican.jmastanalysis.system.MSystem;
 import es.istr.unican.jmastanalysis.system.config.SystemConfig;
 import es.istr.unican.jmastanalysis.system.config.deadline.DeadlineConfig;
 import es.istr.unican.jmastanalysis.system.config.load.LoadBalancingOptions;
@@ -80,7 +80,7 @@ public class compareForTrimming {
 
         // Generate ana analyze systems
 
-        MastSystem sys = null;
+        MSystem sys = null;
 
         boolean optIsSched;
         boolean holIsSched;
@@ -111,7 +111,7 @@ public class compareForTrimming {
                 s.setnSteps(nsteps);
                 u.setCurrentU(utilization);
                 s.setUtilization(u);
-                sys = new MastSystem(s);
+                sys = new MSystem(s);
                 sys.setPDPriorities();
                 System.out.printf("%3d (nSteps=%3d, u=%3d) | opt=", seed, nsteps, utilization);
 
