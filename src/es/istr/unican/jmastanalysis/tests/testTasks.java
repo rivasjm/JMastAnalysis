@@ -36,7 +36,7 @@ public class testTasks {
             Flow flow = new Flow(i+1, (i+1)*10000.0, (i+1)*10000.0*nSteps);
 
             for (int j=0; j<nSteps; j++){
-                Step step = new Step((j+1)*2.0, 0.0, tasks.get(j % nTasks));
+                Step step = new Step((j+1)*2.0, 0.0, tasks.get(j % nTasks), 50);
                 flow.addStep(step);
             }
             flows.add(flow);

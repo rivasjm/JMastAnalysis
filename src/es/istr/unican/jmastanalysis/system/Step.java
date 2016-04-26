@@ -16,6 +16,7 @@ public class Step {
     private Double offset;
     private Task task;
     private Flow flow;
+    private Integer overrridenPriority;
 
     // Results
     private Double wcrt;
@@ -27,6 +28,15 @@ public class Step {
         this.wcet = wcet;
         this.bcet = bcet;
         this.task = task;
+        this.overrridenPriority = null;
+        setTask(task);
+    }
+
+    public Step(Double wcet, Double bcet, Task task, Integer overridenPriority){
+        this.wcet = wcet;
+        this.bcet = bcet;
+        this.task = task;
+        this.overrridenPriority = overridenPriority;
         setTask(task);
     }
 
@@ -143,6 +153,11 @@ public class Step {
         pw.format("Operation (\n");
         pw.format("     Type     => Simple,\n");
         pw.format("     Name     => O_%s,\n", getId());
+        if (this.overrridenPriority != null){
+            pw.format("     New_Sched_Parameters       => \n");
+            pw.format("        ( Type         => Overridden_Fixed_Priority,\n");
+            pw.format("          The_Priority => %d),\n", this.overrridenPriority);
+        }
         pw.format(Locale.US, "     Worst_Case_Execution_Time     => %f,\n", getWcet());
         pw.format(Locale.US, "     Best_Case_Execution_Time     => %f);\n\n", getBcet());
 
