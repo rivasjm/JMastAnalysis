@@ -1,6 +1,6 @@
 <component name="libraryTable">
-  <library name="org.apache.commons:commons-lang3:3.4" type="repository">
-    <properties maven-id="org.apache.commons:commons-lang3:3.4" />
+  <library name="org.apache.commons:commons-lang3:Latest" type="repository">
+    <properties maven-id="org.apache.commons:commons-lang3:LATEST" />
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/commons-lang3-3.4.jar!/" />
     </CLASSES>

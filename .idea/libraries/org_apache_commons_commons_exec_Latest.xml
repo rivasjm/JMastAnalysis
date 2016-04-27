@@ -1,6 +1,6 @@
 <component name="libraryTable">
-  <library name="org.apache.commons:commons-exec:1.3" type="repository">
-    <properties maven-id="org.apache.commons:commons-exec:1.3" />
+  <library name="org.apache.commons:commons-exec:Latest" type="repository">
+    <properties maven-id="org.apache.commons:commons-exec:LATEST" />
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/commons-exec-1.3.jar!/" />
     </CLASSES>
