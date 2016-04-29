@@ -273,12 +273,23 @@ public class MFlow {
         pw.format("      Event_Handlers            => (\n");
         MStep mt = iterator2.next();
         while (true) {
-            pw.format("              (Type                => Activity,\n");
-            pw.format("               Input_Event         => %s,\n", prevID);
-            prevID = String.format("IE_%s", mt.getId());
-            pw.format("               Output_Event        => IE_%s,\n", mt.getId());
-            pw.format("               Activity_Operation  => O_%s,\n", mt.getId());
-            pw.format("               Activity_Server     => SS_%s)", mt.getTask().getId());
+            if (mt.getType() == MStep.StepType.ACTIVITY) {
+                pw.format("              (Type                => Activity,\n");
+                pw.format("               Input_Event         => %s,\n", prevID);
+                prevID = String.format("IE_%s", mt.getId());
+                pw.format("               Output_Event        => IE_%s,\n", mt.getId());
+                pw.format("               Activity_Operation  => O_%s,\n", mt.getId());
+                pw.format("               Activity_Server     => SS_%s)", mt.getTask().getId());
+            }
+            else if (mt.getType() == MStep.StepType.DELAY) {
+                pw.format("              (Type                => Delay,\n");
+                pw.format("               Input_Event         => %s,\n", prevID);
+                prevID = String.format("IE_%s", mt.getId());
+                pw.format("               Output_Event        => IE_%s,\n", mt.getId());
+                pw.format(Locale.US, "               Delay_Max_Interval  => %f,\n", mt.getWcet());
+                pw.format(Locale.US, "               Delay_Min_Interval  => %f)", mt.getBcet());
+            }
+
             if (iterator2.hasNext()) {
                 pw.format(",\n");
                 mt = iterator2.next();

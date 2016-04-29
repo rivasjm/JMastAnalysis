@@ -8,6 +8,8 @@ import java.util.Locale;
  */
 public class MStep {
 
+    public enum StepType {ACTIVITY, DELAY};
+
     private String id;
 
     // Basic Characteristics
@@ -17,6 +19,8 @@ public class MStep {
     private MTask task;
     private MFlow flow;
     private Integer overrridenPriority;
+    private StepType type = StepType.ACTIVITY;
+
 
     // Results
     private Double wcrt;
@@ -46,6 +50,14 @@ public class MStep {
 
     // Getters and Setters
 
+
+    public StepType getType() {
+        return type;
+    }
+
+    public void setType(StepType type) {
+        this.type = type;
+    }
 
     public MTask getTask() {
         return task;
@@ -150,16 +162,18 @@ public class MStep {
 
     public void writeOperation(PrintWriter pw) {
 
-        pw.format("Operation (\n");
-        pw.format("     Type     => Simple,\n");
-        pw.format("     Name     => O_%s,\n", getId());
-        if (this.overrridenPriority != null){
-            pw.format("     New_Sched_Parameters       => \n");
-            pw.format("        ( Type         => Overridden_Fixed_Priority,\n");
-            pw.format("          The_Priority => %d),\n", this.overrridenPriority);
+        if (type == StepType.ACTIVITY) {
+            pw.format("Operation (\n");
+            pw.format("     Type     => Simple,\n");
+            pw.format("     Name     => O_%s,\n", getId());
+            if (this.overrridenPriority != null) {
+                pw.format("     New_Sched_Parameters       => \n");
+                pw.format("        ( Type         => Overridden_Fixed_Priority,\n");
+                pw.format("          The_Priority => %d),\n", this.overrridenPriority);
+            }
+            pw.format(Locale.US, "     Worst_Case_Execution_Time     => %f,\n", getWcet());
+            pw.format(Locale.US, "     Best_Case_Execution_Time     => %f);\n\n", getBcet());
         }
-        pw.format(Locale.US, "     Worst_Case_Execution_Time     => %f,\n", getWcet());
-        pw.format(Locale.US, "     Best_Case_Execution_Time     => %f);\n\n", getBcet());
 
     }
 
