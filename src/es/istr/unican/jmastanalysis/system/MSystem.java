@@ -25,10 +25,10 @@ public class MSystem {
     private Random random;
 
     private SystemConfig systemConfig;
-    private MastConfig toolConfig; //configuration of the tool with which the results where created
+    private MastConfig toolConfig;  //configuration of the tool with which the results where created
 
-    private long toolTimeElapsed; // Time elapsed to execute tool with this system
-
+    private long toolTimeElapsed;   // Time elapsed to execute tool with this system (result)
+    private Double systemSlack;     // System Slack (result)
 
     // Public methods
 
