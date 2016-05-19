@@ -147,7 +147,7 @@ public class MastTool {
         }
     }
 
-    public static void integrateMASTResults(File results, MSystem system) {
+    private static void integrateMASTResults(File results, MSystem system) {
 
         JAXBContext jaxbContext = null;
         try {
