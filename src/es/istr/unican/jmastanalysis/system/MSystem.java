@@ -121,6 +121,14 @@ public class MSystem {
         flows.get(flowId - 1).setStepResults(stepID, bcrt, wcrt, jitter);
     }
 
+    public Double getSystemSlack() {
+        return systemSlack;
+    }
+
+    public void setSystemSlack(Double systemSlack) {
+        this.systemSlack = systemSlack;
+    }
+
     public double getSystemAvgWCRT() {
         Double sum = 0.0;
         for (MFlow f : this.flows) {

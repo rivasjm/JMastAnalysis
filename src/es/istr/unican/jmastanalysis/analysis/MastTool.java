@@ -4,6 +4,7 @@ import es.istr.unican.jmastanalysis.analysis.config.AnalysisOptions;
 import es.istr.unican.jmastanalysis.analysis.config.AssignmentOptions;
 import es.istr.unican.jmastanalysis.analysis.config.MastConfig;
 import es.istr.unican.jmastanalysis.analysis.results.REALTIMESITUATION;
+import es.istr.unican.jmastanalysis.analysis.results.Slack;
 import es.istr.unican.jmastanalysis.analysis.results.TimingResult;
 import es.istr.unican.jmastanalysis.analysis.results.TransactionResults;
 import es.istr.unican.jmastanalysis.exceptions.InterruptedAnalysis;
@@ -146,7 +147,7 @@ public class MastTool {
         }
     }
 
-    private static void integrateMASTResults(File results, MSystem system) {
+    public static void integrateMASTResults(File results, MSystem system) {
 
         JAXBContext jaxbContext = null;
         try {
@@ -178,6 +179,9 @@ public class MastTool {
 
                         }
                     }
+                } else if (o instanceof Slack) {
+                    Slack slack = (Slack) o;
+                    system.setSystemSlack((double)slack.getValue());
                 }
             }
 
